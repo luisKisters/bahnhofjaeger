@@ -73,3 +73,4 @@
 ## Other Todos
 
 - [ ] fix pwa images for fancy installer thingy to work
+- [ ] fix station names in csv
