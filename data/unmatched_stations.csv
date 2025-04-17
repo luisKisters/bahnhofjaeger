@@ -1,0 +1,186 @@
+Index1;Code;Serviceeinrichtung;Category;State;Price_SPNV;Price_SPFV;Bemerkung;Serviceeinrichtung_clean
+65;RMV;Alsfeld (Oberhess);5;Hessen;2,40 €;6,30 €;;alsfeld (oberhess)
+78;BWVI;Alte Wöhr;4;Hamburg;2,79 €;6,93 €;;alte wöhr
+214;TLBV;Auerstedt;7;Thüringen;2,70 €;7,22 €;;auerstedt
+3753;TLBV;Bad Lobenstein;6;Thüringen;3,43 €;9,13 €;Name alt: Lobenstein (Thür);bad lobenstein
+346;RMV;Bad Soden (Taunus);5;Hessen;2,40 €;6,30 €;;bad soden (taunus)
+354;TLBV;Bad Sulza Nord;7;Thüringen;2,70 €;7,22 €;;bad sulza nord
+385;VM BW;Balingen (Württ);4;Baden-Württemberg;3,92 €;10,18 €;;balingen (württ)
+432;ZVON;Bautzen;4;Sachsen;8,22 €;21,92 €;;bautzen
+435;BEG;Bayerisch Eisenstein;6;Bayern;2,89 €;7,59 €;;bayerisch eisenstein
+2753;RMV;Beerfelden-Hetzbach;6;Hessen;2,48 €;6,52 €;;beerfelden-hetzbach
+476;ZÖPNV Süd;Bellheim;6;Rheinland-Pfalz;1,99 €;5,22 €;;bellheim
+504;NWL;Berghausen;7;Nordrhein-Westfalen;2,48 €;6,41 €;;berghausen
+535;VBB Berlin;Berlin-Blankenburg;4;Berlin;2,00 €;5,33 €;;berlin-blankenburg
+536;VBB Berlin;Berlin-Buch;4;Berlin;2,00 €;5,33 €;;berlin-buch
+540;VBB Berlin;Berlin-Grünau;4;Berlin;2,00 €;5,33 €;;berlin-grünau
+543;VBB Berlin;Berlin-Hermsdorf;4;Berlin;2,00 €;5,33 €;;berlin-hermsdorf
+546;VBB Berlin;Berlin-Karow;4;Berlin;2,00 €;5,33 €;;berlin-karow
+7721;VBB Berlin;Berlin-Tegel;5;Berlin;1,96 €;5,19 €;;berlin-tegel
+762;VM BW;Bondorf (b Herrenberg);5;Baden-Württemberg;2,91 €;7,35 €;;bondorf (b herrenberg)
+5773;go.R;Bornheim-Sechtem;4;Nordrhein-Westfalen;2,69 €;6,76 €;;bornheim-sechtem
+838;ZPS;Brebach;5;Saarland;1,58 €;4,00 €;;brebach
+875;VM BW;Bretten;4;Baden-Württemberg;3,92 €;10,18 €;;bretten
+933;BEG;Buchenau (Oberbay);5;Bayern;2,72 €;7,01 €;;buchenau (oberbay)
+8364;LNVG;Bunde;6;Niedersachsen;4,23 €;10,34 €;Inbetriebnahme 06/2025;bunde
+454;LNVG;Burhafe;7;Niedersachsen;2,85 €;7,60 €;;burhafe
+1019;VBB;Calau (Niederlausitz);5;Brandenburg;3,44 €;9,13 €;;calau (niederlausitz)
+1027;VMV;Cammin (Meckl);6;Mecklenburg-Vorpommern;4,20 €;11,06 €;;cammin (meckl)
+1052;VMS;Chemnitz-Schönau;6;Sachsen;3,63 €;9,66 €;;chemnitz-schönau
+1077;VBB;Cottbus Hbf;2;Brandenburg;36,93 €;96,78 €;;cottbus hbf
+1202;go.R;Dieringhausen;5;Nordrhein-Westfalen;2,69 €;7,09 €;;dieringhausen
+1231;VMS;Dittersbach (b Frankenberg/Sachs);7;Sachsen;2,75 €;7,32 €;;dittersbach (b frankenberg/sachs)
+1262;NASA;Domnitz (SaalKr);7;Sachsen-Anhalt;2,77 €;7,39 €;;domnitz (saalkr)
+1330;LNVG;Dorum (Kr Cuxhaven);6;Niedersachsen;4,23 €;10,34 €;;dorum (kr cuxhaven)
+1373;ZPS;Dudweiler;6;Saarland;1,54 €;4,04 €;;dudweiler
+1376;VRR;Duisburg-Bissingheim;7;Nordrhein-Westfalen;2,87 €;7,64 €;;duisburg-bissingheim
+1448;LNVG;Ebstorf (Kr Uelzen);6;Niedersachsen;4,23 €;10,34 €;;ebstorf (kr uelzen)
+1455;TLBV;Eckartsberga (Thür);6;Thüringen;3,43 €;9,13 €;;eckartsberga (thür)
+1488;ZVRP Nord;Ehrang;5;Rheinland-Pfalz;2,59 €;5,24 €;;ehrang
+1498;BEG;Eichenau (Oberbay);5;Bayern;2,72 €;7,01 €;;eichenau (oberbay)
+1574;RMV;Elz (Kr Limburg/Lahn);6;Hessen;2,48 €;6,52 €;;elz (kr limburg/lahn)
+1575;RMV;Elz (Kr Limburg/Lahn) Süd;7;Hessen;1,88 €;4,96 €;;elz (kr limburg/lahn) süd
+1602;ZÖPNV Süd;Enkenbach;6;Rheinland-Pfalz;1,99 €;5,22 €;;enkenbach
+1618;RMV;Erbach (Odenw) Nord;6;Hessen;2,48 €;6,52 €;;erbach (odenw) nord
+1653;VMS;Erlau (Sachs);6;Sachsen;3,63 €;9,66 €;;erlau (sachs)
+1782;NWL;Ferndorf (Kr Siegen);7;Nordrhein-Westfalen;2,48 €;6,41 €;;ferndorf (kr siegen)
+1810;NAH.SH;Flensburg;3;Schleswig-Holstein;9,48 €;25,32 €;;flensburg
+1864;RMV;Frankfurt (Main) Hauptwache;3;Hessen;4,14 €;10,93 €;;frankfurt (main) hauptwache
+1865;RMV;Frankfurt (Main) Konstablerwache;3;Hessen;4,14 €;10,93 €;;frankfurt (main) konstablerwache
+1850;RMV;Frankfurt (Main) Lokalbahnhof;4;Hessen;2,78 €;6,42 €;;frankfurt (main) lokalbahnhof
+1851;RMV;Frankfurt (Main) Mühlberg;4;Hessen;2,78 €;6,42 €;;frankfurt (main) mühlberg
+1853;RMV;Frankfurt (Main) Ostendstraße;3;Hessen;4,14 €;10,93 €;;frankfurt (main) ostendstraße
+1855;RMV;Frankfurt (Main) Stresemannallee;4;Hessen;2,78 €;6,42 €;;frankfurt (main) stresemannallee
+1857;RMV;Frankfurt (Main) Taunusanlage;3;Hessen;4,14 €;10,93 €;;frankfurt (main) taunusanlage
+1871;RMV;Frankfurt-Griesheim;4;Hessen;2,78 €;6,42 €;;frankfurt-griesheim
+1875;RMV;Frankfurt-Nied;5;Hessen;2,40 €;6,30 €;;frankfurt-nied
+1879;RMV;Frankfurt-Sossenheim;6;Hessen;2,48 €;6,52 €;;frankfurt-sossenheim
+1927;VM BW;Fridingen (b Tuttlingen);6;Baden-Württemberg;2,35 €;6,18 €;;fridingen (b tuttlingen)
+1929;BEG;Friedberg (b Augsburg);5;Bayern;2,72 €;7,01 €;;friedberg (b augsburg)
+1983;BEG;Furth (b Deisenhofen);5;Bayern;2,72 €;7,01 €;;furth (b deisenhofen)
+2129;LNVG;Gittelde;7;Niedersachsen;2,85 €;7,60 €;;gittelde
+2140;RMV;Glauburg-Glauberg;6;Hessen;2,48 €;6,52 €;;glauburg-glauberg
+6033;RMV;Glauburg-Stockheim;5;Hessen;2,40 €;6,30 €;;glauburg-stockheim
+2177;VBB;Gollmitz (Niederlausitz);7;Brandenburg;3,21 €;8,56 €;;gollmitz (niederlausitz)
+2275;ZVNL;Grimma ob Bf;5;Sachsen;3,24 €;8,61 €;;grimma ob bf
+2329;go.R;Großbüllesheim;6;Nordrhein-Westfalen;3,77 €;8,76 €;;großbüllesheim
+2342;RMV;Großenlüder;6;Hessen;2,48 €;6,52 €;;großenlüder
+2412;VM BW;Gundelfingen;5;Baden-Württemberg;2,91 €;7,35 €;;gundelfingen
+2407;ZPS;Güdingen;5;Saarland;1,58 €;4,00 €;;güdingen
+2425;NASA;Güsen (Kr Genthin);6;Sachsen-Anhalt;3,34 €;8,90 €;;güsen (kr genthin)
+2506;BEG;Hallstadt (b Bamberg);5;Bayern;2,72 €;7,01 €;;hallstadt (b bamberg)
+2576;LNVG;Hasbergen (Kr Osnabrück);6;Niedersachsen;4,23 €;10,34 €;;hasbergen (kr osnabrück)
+7623;VM BW;Heilbronn Trappensee;6;Baden-Württemberg;2,35 €;6,18 €;;heilbronn trappensee
+2662;BWVI;Heimfeld;4;Hamburg;2,79 €;6,93 €;;heimfeld
+8365;VRR;Herten-Westerholt;6;Nordrhein-Westfalen;2,76 €;7,00 €;Inbetriebnahme 30.06.2025;herten-westerholt
+3081;RMV;Hesseneck-Kailbach;6;Hessen;2,48 €;6,52 €;;hesseneck-kailbach
+5632;RMV;Hesseneck-Schöllenbach;6;Hessen;2,48 €;6,52 €;;hesseneck-schöllenbach
+2800;VM BW;Hochdorf (b Horb);6;Baden-Württemberg;2,35 €;6,18 €;;hochdorf (b horb)
+2834;VBB;Hosena;5;Brandenburg;3,44 €;9,13 €;;hosena
+2932;VVO;Hoyerswerda-Neustadt;7;Sachsen;2,46 €;6,58 €;;hoyerswerda-neustadt
+2958;ZVRP Nord;Hüttingen;7;Rheinland-Pfalz;2,00 €;4,62 €;;hüttingen
+8379;LNVG;Ihrhove;6;Niedersachsen;4,23 €;10,34 €;Inbetriebnahme 15.06.2025;ihrhove
+2988;BEG;Indersdorf;6;Bayern;2,89 €;7,59 €;;indersdorf
+2992;ZÖPNV Süd;Ingelheim;4;Rheinland-Pfalz;2,84 €;7,40 €;;ingelheim
+3057;ZÖPNV Süd;Jockgrim;6;Rheinland-Pfalz;1,99 €;5,22 €;;jockgrim
+3034;VBB;Jänschwalde Ost;6;Brandenburg;3,98 €;10,22 €;;jänschwalde ost
+3097;VVO;Kamenz (Sachs);6;Sachsen;2,85 €;7,61 €;;kamenz (sachs)
+3175;go.R;Kierberg;5;Nordrhein-Westfalen;2,69 €;7,09 €;;kierberg
+3186;ZVRP Nord;Kirchen;5;Rheinland-Pfalz;2,59 €;5,24 €;;kirchen
+3269;VBB;Klinge;6;Brandenburg;3,98 €;10,22 €;;klinge
+3276;ZVON;Klitten;7;Sachsen;3,35 €;8,94 €;;klitten
+3313;VBB;Kolkwitz;6;Brandenburg;3,98 €;10,22 €;;kolkwitz
+3314;VBB;Kolkwitz Süd;6;Brandenburg;3,98 €;10,22 €;;kolkwitz süd
+7986;RMV;Kronberg (Taunus) Süd;6;Hessen;2,48 €;6,52 €;;kronberg (taunus) süd
+3445;VM BW;Kuchen;6;Baden-Württemberg;2,35 €;6,18 €;;kuchen
+4861;VBB;Kunersdorf;6;Brandenburg;3,98 €;10,22 €;;kunersdorf
+3563;RMV;Langsdorf (Oberhess);6;Hessen;2,48 €;6,52 €;;langsdorf (oberhess)
+3622;RVB;Leiferde (b Gifhorn);6;Niedersachsen;4,87 €;10,77 €;;leiferde (b gifhorn)
+3696;RMV;Lich (Oberhess);5;Hessen;2,40 €;6,30 €;;lich (oberhess)
+7263;NAH.SH;Lindaunis;7;Schleswig-Holstein;2,21 €;5,91 €;;lindaunis
+3736;LNVG;Lindhorst (Schaumb-Lippe);6;Niedersachsen;4,23 €;10,34 €;;lindhorst (schaumb-lippe)
+3802;VBB;Lübben (Spreewald);4;Brandenburg;5,17 €;13,68 €;;lübben (spreewald)
+3815;VMV;Lüblow (Meckl);6;Mecklenburg-Vorpommern;4,20 €;11,06 €;;lüblow (meckl)
+3818;NASA;Lübs (b Magdeburg);6;Sachsen-Anhalt;3,34 €;8,90 €;;lübs (b magdeburg)
+5032;NWL;Lünen Preußen;5;Nordrhein-Westfalen;3,91 €;9,89 €;Name alt: Preußen;lünen preußen
+7148;VM BW;Marbach Ost Villingen-Schwenningen;7;Baden-Württemberg;1,90 €;5,07 €;;marbach ost villingen-schwenningen
+7147;VM BW;Marbach West Villingen-Schwenningen;7;Baden-Württemberg;1,90 €;5,07 €;;marbach west villingen-schwenningen
+1532;ZÖPNV Süd;Matzenbach;7;Rheinland-Pfalz;1,49 €;4,01 €;;matzenbach
+1901;NWL;Meschede-Freienohl;5;Nordrhein-Westfalen;3,91 €;9,89 €;;meschede-freienohl
+6840;VBB Berlin;Messe Nord / ICC (Witzleben);4;Berlin;2,00 €;5,33 €;;messe nord / icc (witzleben)
+4087;VM BW;Metzingen;4;Baden-Württemberg;3,92 €;10,18 €;;metzingen
+4193;RMV;Mücke (Hessen);6;Hessen;2,48 €;6,52 €;;mücke (hessen)
+4202;VM BW;Mühlen (b Horb);7;Baden-Württemberg;1,90 €;5,07 €;;mühlen (b horb)
+4209;VM BW;Mühlheim (b Tuttlingen);7;Baden-Württemberg;1,90 €;5,07 €;;mühlheim (b tuttlingen)
+4233;BEG;München Harras;4;Bayern;3,19 €;7,89 €;;münchen harras
+4246;BEG;München-Allach;4;Bayern;3,19 €;7,89 €;;münchen-allach
+4247;BEG;München-Aubing;5;Bayern;2,72 €;7,01 €;;münchen-aubing
+4258;BEG;München-Laim Pbf;3;Bayern;4,75 €;12,53 €;;münchen-laim pbf
+4262;BEG;München-Moosach;4;Bayern;3,19 €;7,89 €;;münchen-moosach
+4268;BEG;München-Riem Pbf;4;Bayern;3,19 €;7,89 €;;münchen-riem pbf
+4278;RMV;Münster (b Dieburg);6;Hessen;2,48 €;6,52 €;;münster (b dieburg)
+8396;LNVG;Neermoor;6;Niedersachsen;4,23 €;10,34 €;Inbetriebnahme 25.07.2025;neermoor
+4374;RVB;Neudorf-Platendorf;7;Niedersachsen;2,54 €;6,37 €;Ausserbetriebnahme 21.02.2025;neudorf-platendorf
+4382;VBB;Neuenhagen (b Berlin);6;Brandenburg;3,98 €;10,22 €;;neuenhagen (b berlin)
+4411;LNVG;Neukloster (Kr Stade);6;Niedersachsen;4,23 €;10,34 €;;neukloster (kr stade)
+4552;ZVON;Niesky;6;Sachsen;3,28 €;8,70 €;;niesky
+4655;VM BW;Oberkirch-Koehlersiedlung;7;Baden-Württemberg;1,90 €;5,07 €;;oberkirch-koehlersiedlung
+4700;RMV;Obertshausen (Kr Offenbach);5;Hessen;2,40 €;6,30 €;;obertshausen (kr offenbach)
+4702;RMV;Oberursel (Taunus);4;Hessen;2,78 €;6,42 €;;oberursel (taunus)
+7170;RMV;Offenbach Ledermuseum;4;Hessen;2,78 €;6,42 €;;offenbach ledermuseum
+7171;RMV;Offenbach Marktplatz;4;Hessen;2,78 €;6,42 €;;offenbach marktplatz
+7169;RMV;Offenbach-Kaiserlei;4;Hessen;2,78 €;6,42 €;;offenbach-kaiserlei
+4797;NASA;Osternienburg;6;Sachsen-Anhalt;3,34 €;8,90 €;;osternienburg
+4807;RMV;Ostheim (Kr Hanau);6;Hessen;2,48 €;6,52 €;;ostheim (kr hanau)
+4860;TLBV;Papiermühle (Kr Stadtroda);6;Thüringen;3,43 €;9,13 €;;papiermühle (kr stadtroda)
+4893;VBB;Peitz Ost;6;Brandenburg;3,98 €;10,22 €;;peitz ost
+4906;ZVON;Petershain;7;Sachsen;3,35 €;8,94 €;;petershain
+7889;VM BW;Pforzheim-Weißenstein;7;Baden-Württemberg;1,90 €;5,07 €;;pforzheim-weißenstein
+4988;ZVON;Pommritz;6;Sachsen;3,28 €;8,70 €;;pommritz
+4992;NAH.SH;Pönitz (Holst);6;Schleswig-Holstein;3,53 €;9,43 €;;pönitz (holst)
+5074;ZVRP Nord;Quint;6;Rheinland-Pfalz;2,27 €;5,85 €;;quint
+8458;VRN;Rimbach Schulzentrum;6;Hessen;2,31 €;6,13 €;Inbetriebnahme 16.08.2025;rimbach schulzentrum
+5305;RMV;Rodenbach bei Hanau;5;Hessen;2,40 €;6,30 €;;rodenbach bei hanau
+5311;RMV;Rodheim v d Höhe;7;Hessen;1,88 €;4,96 €;;rodheim v d höhe
+5399;VM BW;Rottenburg (Neckar);5;Baden-Württemberg;2,91 €;7,35 €;;rottenburg (neckar)
+5378;VM BW;Rötenbach (Baden);7;Baden-Württemberg;1,90 €;5,07 €;;rötenbach (baden)
+5408;BWVI;Rübenkamp;4;Hamburg;2,79 €;6,93 €;;rübenkamp
+5429;ZÖPNV Süd;Rülzheim;6;Rheinland-Pfalz;1,99 €;5,22 €;;rülzheim
+5456;ZVRP Nord;Saarburg (Bz Trier);4;Rheinland-Pfalz;4,57 €;11,36 €;;saarburg (bz trier)
+5529;ZPS;Schafbrücke;6;Saarland;1,54 €;4,04 €;;schafbrücke
+5554;ZPS;Scheidt (Saar);5;Saarland;1,58 €;4,00 €;;scheidt (saar)
+5583;ZVON;Schleife;6;Sachsen;3,28 €;8,70 €;;schleife
+955;RMV;Schöneck-Büdesheim;6;Hessen;2,48 €;6,52 €;;schöneck-büdesheim
+3178;RMV;Schöneck-Kilianstädten;6;Hessen;2,48 €;6,52 €;;schöneck-kilianstädten
+4633;RMV;Schöneck-Oberdorfelden;6;Hessen;2,48 €;6,52 €;;schöneck-oberdorfelden
+800;NWL;Senden-Bösensell;5;Nordrhein-Westfalen;3,91 €;9,89 €;Name alt: Bösensell;senden-bösensell
+5823;VBB;Senftenberg;5;Brandenburg;3,44 €;9,13 €;;senftenberg
+5872;BEG;Sinzing (b Regensburg);6;Bayern;2,89 €;7,59 €;;sinzing (b regensburg)
+5994;NASA;Steinfeld (b Stendal);7;Sachsen-Anhalt;2,77 €;7,39 €;;steinfeld (b stendal)
+2516;BWVI;Sternschanze;3;Hamburg;2,76 €;7,25 €;;sternschanze
+6023;VM BW;Stetten (Donau);7;Baden-Württemberg;1,90 €;5,07 €;;stetten (donau)
+6072;VRStutt;Stuttgart Neckarpark;4;Baden-Württemberg;2,90 €;7,74 €;;stuttgart neckarpark
+6073;VRStutt;Stuttgart Nord;5;Baden-Württemberg;2,09 €;5,58 €;;stuttgart nord
+6084;VRStutt;Stuttgart-Sommerrain;5;Baden-Württemberg;2,09 €;5,58 €;;stuttgart-sommerrain
+6088;VRStutt;Stuttgart-Weilimdorf;5;Baden-Württemberg;2,09 €;5,58 €;;stuttgart-weilimdorf
+6114;RMV;Sulzbach (Taunus);6;Hessen;2,48 €;6,52 €;;sulzbach (taunus)
+6115;RMV;Sulzbach (Taunus) Nord;6;Hessen;2,48 €;6,52 €;;sulzbach (taunus) nord
+6118;BEG;Sulzberg;7;Bayern;2,13 €;5,65 €;;sulzberg
+6245;NASA;Trebitz (b Könnern);7;Sachsen-Anhalt;2,77 €;7,39 €;;trebitz (b könnern)
+6276;VM BW;Trossingen Bahnhof;6;Baden-Württemberg;2,35 €;6,18 €;;trossingen bahnhof
+6287;BEG;Türkheim (Bay) Bahnhof;4;Bayern;3,19 €;7,89 €;;türkheim (bay) bahnhof
+6319;ZVON;Uhyst;7;Sachsen;3,35 €;8,94 €;;uhyst
+6373;go.R;Urft;6;Nordrhein-Westfalen;3,77 €;8,76 €;;urft
+1389;VRR;Viersen-Dülken;5;Nordrhein-Westfalen;2,32 €;5,93 €;;viersen-dülken
+7153;VM BW;Villingen-Schwenningen Eisstadion;7;Baden-Württemberg;1,90 €;5,07 €;;villingen-schwenningen eisstadion
+7154;VM BW;Villingen-Schwenningen Hammerstatt;7;Baden-Württemberg;1,90 €;5,07 €;;villingen-schwenningen hammerstatt
+6444;LNVG;Voldagsen;6;Niedersachsen;4,23 €;10,34 €;;voldagsen
+6487;VM BW;Waldkirch;5;Baden-Württemberg;2,91 €;7,35 €;;waldkirch
+6503;RMV;Walldorf (Hess);5;Hessen;2,40 €;6,30 €;;walldorf (hess)
+6575;NAH.SH;Wedel (Holst);5;Schleswig-Holstein;3,75 €;9,91 €;;wedel (holst)
+6654;NASA;Wellen (b Magdeburg);6;Sachsen-Anhalt;3,34 €;8,90 €;;wellen (b magdeburg)
+714;VRR;Wesel-Blumenkamp;6;Nordrhein-Westfalen;2,76 €;7,00 €;Name alt: Blumenkamp;wesel-blumenkamp
+6705;BEG;Weßling (Oberbay);5;Bayern;2,72 €;7,01 €;;weßling (oberbay)
+6824;VBB Berlin;Wittenau (Wilhelmsruher Damm);4;Berlin;2,00 €;5,33 €;;wittenau (wilhelmsruher damm)
+7021;go.R;Zieverich;5;Nordrhein-Westfalen;2,69 €;7,09 €;;zieverich
+7155;VM BW;Zollhaus Villingen-Schwenningen;7;Baden-Württemberg;1,90 €;5,07 €;;zollhaus villingen-schwenningen
