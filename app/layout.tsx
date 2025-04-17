@@ -1,29 +1,29 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import Script from "next/script";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: "#0052D4",
+};
 
 export const metadata: Metadata = {
   title: "Bahnhofjaeger",
-  description: "A Progressive Web App",
+  description: "Collect train stations and earn points",
   manifest: "/manifest.json",
-  themeColor: "#000000",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Bahnhofjaeger",
   },
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export default function RootLayout({
@@ -40,33 +40,43 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Bahnhofjaeger" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#000000" />
+        <meta name="msapplication-TileColor" content="#0052D4" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="theme-color" content="#0052D4" />
 
-        {/* Apple Touch Icons */}
-        <link rel="apple-touch-icon" href="/icon-192x192.png" />
-        <link rel="apple-touch-icon" sizes="192x192" href="/icon-192x192.png" />
-        <link rel="apple-touch-icon" sizes="512x512" href="/icon-512x512.png" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link
+          rel="apple-touch-icon"
+          sizes="152x152"
+          href="/icons/icon-144x144.png"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/icons/icon-192x192.png"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="167x167"
+          href="/icons/icon-192x192.png"
+        />
 
-        {/* Standard Icons */}
         <link
           rel="icon"
           type="image/png"
-          sizes="192x192"
-          href="/icon-192x192.png"
+          sizes="32x32"
+          href="/icons/icon-32x32.png"
         />
         <link
           rel="icon"
           type="image/png"
-          sizes="512x512"
-          href="/icon-512x512.png"
+          sizes="16x16"
+          href="/icons/icon-16x16.png"
         />
+        <link rel="mask-icon" href="/icons/icon-512x512.png" color="#0052D4" />
+        <link rel="shortcut icon" href="/favicon.ico" />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-        <Script src="/pwa.js" strategy="lazyOnload" />
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
