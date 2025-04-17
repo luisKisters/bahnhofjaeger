@@ -64,3 +64,12 @@
 - [ ] Map view
 - [ ] Achievements
 - [ ] Social sharing
+- [ ] Leaderboard
+- [ ] Mutiplayer
+- [ ] Map "enrichment" with additional station data
+- [ ] Statistic (visited e.g "21/240 Stations")
+- [ ] Stop using next-pwa and follow more: https://nextjs.org/docs/app/building-your-application/configuring/progressive-web-apps
+
+## Other Todos
+
+- [ ] fix pwa images for fancy installer thingy to work

@@ -1,103 +1,144 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useState } from "react";
+import Link from "next/link";
+import Layout from "@/app/components/Layout";
+import InitializationScreen from "@/app/components/InitializationScreen";
+import StatsCard from "@/app/components/StatsCard";
+import { useCollection } from "@/app/lib/useCollection";
+import { getAllStations } from "@/app/lib/stations";
+
+export default function HomePage() {
+  const { stats, isLoading } = useCollection();
+  const [dbInfo, setDbInfo] = useState<{
+    totalStations: number;
+    samples: any[];
+  } | null>(null);
+  const [showDebug, setShowDebug] = useState(false);
+
+  const checkDatabase = async () => {
+    try {
+      const stations = await getAllStations();
+      setDbInfo({
+        totalStations: stations.length,
+        samples: stations.slice(0, 3),
+      });
+      setShowDebug(true);
+    } catch (error) {
+      console.error("Failed to load database info:", error);
+      alert("Error loading database info");
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <InitializationScreen>
+      <Layout>
+        <div className="max-w-md mx-auto">
+          <h1 className="text-3xl font-bold text-gray-800 mb-6">
+            Bahnhofjaeger
+          </h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          {/* Collection Stats */}
+          {!isLoading && <StatsCard stats={stats} />}
+
+          {/* Loading state */}
+          {isLoading && (
+            <div className="flex justify-center my-8">
+              <div className="w-8 h-8 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+            </div>
+          )}
+
+          {/* Debug Info */}
+          <div className="mb-6">
+            <button
+              onClick={checkDatabase}
+              className="bg-gray-200 text-gray-800 rounded-lg p-2 text-sm w-full mb-2"
+            >
+              Check Database
+            </button>
+
+            {showDebug && dbInfo && (
+              <div className="bg-gray-100 p-4 rounded-lg text-sm mb-4">
+                <h3 className="font-semibold">Database Info</h3>
+                <p>Total stations: {dbInfo.totalStations}</p>
+                {dbInfo.samples.length > 0 ? (
+                  <div>
+                    <p className="mt-2 font-semibold">Sample stations:</p>
+                    <pre className="bg-gray-50 p-2 rounded overflow-auto max-h-40 text-xs">
+                      {JSON.stringify(dbInfo.samples, null, 2)}
+                    </pre>
+                  </div>
+                ) : (
+                  <p className="text-red-500">No stations found in database!</p>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Quick actions */}
+          <div className="grid grid-cols-1 gap-4 mb-6">
+            <Link
+              href="/search"
+              className="bg-blue-600 text-white rounded-lg shadow-md p-6 text-center hover:bg-blue-700 transition-colors"
+            >
+              <div className="flex flex-col items-center">
+                <svg
+                  className="w-8 h-8 mb-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                <span className="text-xl font-semibold">Search Stations</span>
+              </div>
+            </Link>
+
+            <Link
+              href="/collection"
+              className="bg-green-600 text-white rounded-lg shadow-md p-6 text-center hover:bg-green-700 transition-colors"
+            >
+              <div className="flex flex-col items-center">
+                <svg
+                  className="w-8 h-8 mb-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                  />
+                </svg>
+                <span className="text-xl font-semibold">View Collection</span>
+              </div>
+            </Link>
+          </div>
+
+          {/* App Info */}
+          <div className="bg-white rounded-lg shadow-md p-4">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">
+              About Bahnhofjaeger
+            </h2>
+            <p className="text-gray-600 mb-2">
+              Collect train stations and earn points based on their price class.
+              Higher price classes earn more points!
+            </p>
+            <p className="text-sm text-gray-500">
+              This app works offline - perfect for your train journeys.
+            </p>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </Layout>
+    </InitializationScreen>
   );
 }
