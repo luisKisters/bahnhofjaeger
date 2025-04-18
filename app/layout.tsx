@@ -1,14 +1,21 @@
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import type { Metadata } from "next";
-import ServiceWorkerRegistration from "./components/ServiceWorkerRegistration";
+
+const inter = Inter({ subsets: ["latin"] });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: "#0052D4",
+};
 
 export const metadata: Metadata = {
   title: "Bahnhofjaeger",
-  description:
-    "Collect train stations and earn points based on their price class",
+  description: "Collect train stations and earn points",
   manifest: "/manifest.json",
-  themeColor: "#3b82f6",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -27,15 +34,49 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <meta name="application-name" content="Bahnhofjaeger" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Bahnhofjaeger" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-TileColor" content="#0052D4" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="theme-color" content="#0052D4" />
+
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link
+          rel="apple-touch-icon"
+          sizes="152x152"
+          href="/icons/icon-144x144.png"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/icons/icon-192x192.png"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="167x167"
+          href="/icons/icon-192x192.png"
+        />
+
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/icons/icon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/icons/icon-16x16.png"
+        />
+        <link rel="mask-icon" href="/icons/icon-512x512.png" color="#0052D4" />
+        <link rel="shortcut icon" href="/favicon.ico" />
       </head>
-      <body>
-        <ServiceWorkerRegistration />
-        {children}
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
