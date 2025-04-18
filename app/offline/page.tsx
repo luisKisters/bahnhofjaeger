@@ -9,7 +9,7 @@ export default function OfflinePage() {
     <Layout>
       <div className="max-w-md mx-auto text-center py-8">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
-          You're Offline
+          You&apos;re Offline
         </h1>
 
         <div className="bg-yellow-50 p-4 rounded-lg mb-6">
