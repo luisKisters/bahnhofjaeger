@@ -11,11 +11,17 @@ export function ServiceWorkerRegistration() {
         try {
           const { Serwist } = await import("@serwist/window");
 
-          // Unregister any existing service workers first to avoid conflicts
+          // Only unregister service workers that aren't from our domain
+          // This prevents the constant reload cycle
           const registrations =
             await navigator.serviceWorker.getRegistrations();
           for (const registration of registrations) {
-            await registration.unregister();
+            if (registration.scope !== window.location.origin + "/") {
+              await registration.unregister();
+              console.log(
+                `Unregistered incompatible service worker with scope: ${registration.scope}`
+              );
+            }
           }
 
           // Register new service worker
@@ -31,8 +37,9 @@ export function ServiceWorkerRegistration() {
           serwist.addEventListener("controlling", (event) => {
             console.log("Serwist service worker controlling", event);
 
-            // Reload the page when the service worker takes control
+            // Only reload the page when there's an update, not on first install
             if (event.isUpdate) {
+              console.log("Service worker updated, reloading page");
               window.location.reload();
             }
           });

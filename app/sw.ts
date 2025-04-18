@@ -1,6 +1,50 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import { Serwist, NetworkFirst } from "serwist";
+
+// Safari patch for FetchEvent.respondWith
+const setupSafariPatch = () => {
+  // Only apply in Safari browsers
+  if (
+    typeof navigator !== "undefined" &&
+    /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+  ) {
+    const originalAddEventListener = self.addEventListener;
+    self.addEventListener = function (
+      type: string,
+      listener: any,
+      options?: any
+    ) {
+      if (type === "fetch") {
+        const wrappedListener = function (event: any) {
+          if (event.respondWith) {
+            const originalRespondWith = event.respondWith;
+            event.respondWith = function (response: any) {
+              try {
+                return originalRespondWith.call(this, response);
+              } catch (error) {
+                console.warn(
+                  "Safari FetchEvent.respondWith error caught and handled:",
+                  error
+                );
+                return originalRespondWith.call(self, response);
+              }
+            };
+          }
+          return listener(event);
+        };
+        return originalAddEventListener.call(
+          this,
+          type,
+          wrappedListener,
+          options
+        );
+      }
+      return originalAddEventListener.call(this, type, listener, options);
+    };
+  }
+};
 
 // This declares the value of `injectionPoint` to TypeScript.
 // `injectionPoint` is the string that will be replaced by the
@@ -14,6 +58,9 @@ declare global {
 
 // Use WorkerGlobalScope which is available in TypeScript lib.webworker.d.ts
 declare const self: WorkerGlobalScope;
+
+// Apply Safari patch
+setupSafariPatch();
 
 // Create custom runtime caching configuration
 const runtimeCaching = [
