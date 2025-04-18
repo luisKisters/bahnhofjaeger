@@ -1,6 +1,6 @@
 import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
-import { Serwist } from "serwist";
+import { Serwist, NetworkFirst } from "serwist";
 
 // This declares the value of `injectionPoint` to TypeScript.
 // `injectionPoint` is the string that will be replaced by the
@@ -15,12 +15,45 @@ declare global {
 // Use WorkerGlobalScope which is available in TypeScript lib.webworker.d.ts
 declare const self: WorkerGlobalScope;
 
+// Create custom runtime caching configuration
+const runtimeCaching = [
+  ...defaultCache,
+  {
+    // Match all navigation requests
+    matcher: ({ request, url }: { request: Request; url: URL }) =>
+      request.mode === "navigate",
+    handler: new NetworkFirst({
+      networkTimeoutSeconds: 10, // Timeout if network takes too long
+      cacheName: "pages",
+      plugins: [
+        {
+          // Cache successful responses
+          cacheWillUpdate: async ({ response }) => {
+            if (response && response.status === 200) {
+              return response;
+            }
+            return null;
+          },
+        },
+      ],
+    }),
+    options: {
+      precacheFallback: {
+        // If the network fails, try to serve from the precache
+        fallbackURL: "/",
+      },
+    },
+  },
+];
+
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
   skipWaiting: true,
   clientsClaim: true,
   navigationPreload: true,
-  runtimeCaching: defaultCache,
+  runtimeCaching: runtimeCaching,
+  // Disable debug logs
+  disableDevLogs: process.env.NODE_ENV === "production",
 });
 
 serwist.addEventListeners();
