@@ -6,11 +6,13 @@ import { CollectionStats } from "@/app/lib/db";
 interface StatsCardProps {
   stats: CollectionStats;
   showPriceClassCompletion?: boolean;
+  className?: string;
 }
 
 export default function StatsCard({
   stats,
   showPriceClassCompletion = true,
+  className = "",
 }: StatsCardProps) {
   // Format the last updated date
   const formatDate = (timestamp: number) => {
@@ -73,7 +75,7 @@ export default function StatsCard({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+    <div className={`bg-white rounded-lg shadow-md p-4 ${className}`}>
       <h2 className="text-lg font-semibold text-gray-800 mb-3">
         Collection Stats
       </h2>

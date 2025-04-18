@@ -4,21 +4,27 @@ import React, { useState } from "react";
 import Layout from "@/app/components/Layout";
 import StatsCard from "@/app/components/StatsCard";
 import StationCard from "@/app/components/StationCard";
-import StationMap from "@/app/components/StationMap";
 import { useCollection } from "@/app/lib/useCollection";
 import dynamic from "next/dynamic";
 
 // Filter options
 type SortOption = "newest" | "oldest" | "points-high" | "points-low" | "name";
 
-// Dynamically import the map component with no SSR to avoid leaflet issues
+// Dynamically import the map component with no SSR to avoid MapTiler/map issues
 const DynamicStationMap = dynamic(() => import("@/app/components/StationMap"), {
   ssr: false,
+  loading: () => (
+    <div
+      className="bg-white rounded-lg shadow-md p-4 mb-4 flex justify-center items-center"
+      style={{ height: "400px" }}
+    >
+      <p className="text-gray-600">Loading map...</p>
+    </div>
+  ),
 });
 
 export default function CollectionPage() {
-  const { isLoading, entries, stats, error, removeStation, refreshCollection } =
-    useCollection();
+  const { isLoading, entries, stats, error, removeStation } = useCollection();
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
 
@@ -50,94 +56,100 @@ export default function CollectionPage() {
 
   return (
     <Layout>
-      <div className="max-w-md mx-auto">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">My Collection</h1>
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">
+          My Station Collection
+        </h1>
 
-        {/* Stats Card */}
-        <StatsCard stats={stats} />
+        {/* Loading state */}
+        {isLoading && (
+          <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+            <p className="text-center text-gray-600">
+              Loading your collection...
+            </p>
+          </div>
+        )}
 
-        {/* View toggle */}
-        <div className="bg-white rounded-lg shadow-md p-4 mb-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <label
-                htmlFor="sort"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Sort by:
-              </label>
-              <select
-                id="sort"
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value as SortOption)}
-                className="block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="points-high">Highest Points</option>
-                <option value="points-low">Lowest Points</option>
-                <option value="name">Station Name</option>
-              </select>
-            </div>
+        {/* Error state */}
+        {error && (
+          <div className="bg-white rounded-lg shadow-md p-4 mb-4 text-red-500">
+            <p>Error loading collection: {error.message || "Unknown error"}</p>
+          </div>
+        )}
 
-            <div className="ml-4">
-              <label
-                htmlFor="viewMode"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                View:
-              </label>
-              <div className="flex border border-gray-300 rounded-md overflow-hidden">
+        {/* Empty state */}
+        {!isLoading && entries.length === 0 && (
+          <div className="bg-white rounded-lg shadow-md p-4 mb-4 text-center">
+            <p className="text-gray-600 mb-2">
+              Your collection is empty. Start collecting stations!
+            </p>
+            <p className="text-sm text-gray-500">
+              Search for stations and add them to your collection.
+            </p>
+          </div>
+        )}
+
+        {/* Stats */}
+        {!isLoading && entries.length > 0 && (
+          <StatsCard stats={stats} className="mb-4" />
+        )}
+
+        {/* Controls */}
+        {!isLoading && entries.length > 0 && (
+          <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+            <div className="flex flex-col sm:flex-row justify-between gap-3">
+              {/* View toggle */}
+              <div className="flex rounded-md shadow-sm" role="group">
                 <button
-                  className={`px-4 py-2 ${
+                  type="button"
+                  className={`px-4 py-2 text-sm font-medium rounded-l-lg ${
                     viewMode === "list"
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-100"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-gray-700 hover:bg-gray-100"
                   }`}
                   onClick={() => setViewMode("list")}
                 >
                   List
                 </button>
                 <button
-                  className={`px-4 py-2 ${
+                  type="button"
+                  className={`px-4 py-2 text-sm font-medium rounded-r-lg ${
                     viewMode === "map"
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-100"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-gray-700 hover:bg-gray-100"
                   }`}
                   onClick={() => setViewMode("map")}
                 >
                   Map
                 </button>
               </div>
+
+              {/* Sort options */}
+              <div className="flex items-center">
+                <label
+                  htmlFor="sort-select"
+                  className="mr-2 text-sm font-medium text-gray-700"
+                >
+                  Sort by:
+                </label>
+                <select
+                  id="sort-select"
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value as SortOption)}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2"
+                >
+                  <option value="newest">Newest first</option>
+                  <option value="oldest">Oldest first</option>
+                  <option value="points-high">Highest points</option>
+                  <option value="points-low">Lowest points</option>
+                  <option value="name">Name (A-Z)</option>
+                </select>
+              </div>
             </div>
           </div>
-        </div>
-
-        {/* Error message */}
-        {error && (
-          <div className="p-3 bg-red-100 text-red-700 rounded-md mb-4">
-            Error: {error.message}
-          </div>
         )}
 
-        {/* Loading state */}
-        {isLoading && (
-          <div className="flex justify-center my-8">
-            <div className="w-8 h-8 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
-          </div>
-        )}
-
-        {/* Empty collection */}
-        {!isLoading && entries.length === 0 && (
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-gray-600 mb-4">Your collection is empty</p>
-            <p className="text-sm text-gray-500">
-              Use the search to find and add stations to your collection
-            </p>
-          </div>
-        )}
-
-        {/* Map View */}
+        {/* Map view */}
         {viewMode === "map" && !isLoading && entries.length > 0 && (
           <DynamicStationMap entries={sortedEntries} />
         )}
