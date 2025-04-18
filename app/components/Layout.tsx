@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import OfflineIndicator from "./OfflineIndicator";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,7 +13,6 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <OfflineIndicator />
       <main className="container mx-auto p-4 pt-6 pb-20">{children}</main>
 
       {/* Bottom navigation */}
