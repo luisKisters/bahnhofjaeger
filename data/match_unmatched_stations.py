@@ -17,7 +17,7 @@ BATCH_SIZE = 10  # Process 10 stations per Gemini call
 
 # Load environment variables
 load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyC2ii8Tn_ZGBMGOvLnJDJ6fD9hqxISwpAM")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Configure Gemini API
 genai.configure(api_key=GEMINI_API_KEY)

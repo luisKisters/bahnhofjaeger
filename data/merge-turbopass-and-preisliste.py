@@ -34,7 +34,7 @@ gemini_threshold = 50  # Very low threshold for collecting candidates for Gemini
 
 # Load environment variables
 load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyC2ii8Tn_ZGBMGOvLnJDJ6fD9hqxISwpAM")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Configure Gemini API if available
 if GEMINI_AVAILABLE and GEMINI_API_KEY:
