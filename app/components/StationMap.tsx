@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import * as maptilersdk from "@maptiler/sdk";
+import "@maptiler/sdk/dist/maptiler-sdk.css";
 import { CollectionEntry } from "@/app/lib/db";
 
-mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+// Initialize MapTiler with your API key
+maptilersdk.config.apiKey = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || "";
 
 interface StationMapProps {
   entries: CollectionEntry[];
@@ -13,7 +14,7 @@ interface StationMapProps {
 
 export default function StationMap({ entries }: StationMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const map = useRef<maptilersdk.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
 
   const validEntries = entries.filter(
@@ -25,17 +26,18 @@ export default function StationMap({ entries }: StationMapProps) {
 
   useEffect(() => {
     if (!mapContainer.current) return;
+    if (map.current) return; // Initialize map only once
 
     // Initialize map
-    map.current = new mapboxgl.Map({
+    map.current = new maptilersdk.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v12",
+      style: maptilersdk.MapStyle.STREETS,
       center: defaultCenter,
       zoom: 5,
     });
 
     // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl());
+    map.current.addControl(new maptilersdk.NavigationControl());
 
     map.current.on("load", () => {
       setMapLoaded(true);
@@ -45,6 +47,7 @@ export default function StationMap({ entries }: StationMapProps) {
     return () => {
       if (map.current) {
         map.current.remove();
+        map.current = null;
       }
     };
   }, []);
@@ -72,10 +75,13 @@ export default function StationMap({ entries }: StationMapProps) {
         }
       `;
 
+      // Create popup
+      const popup = new maptilersdk.Popup().setDOMContent(popupNode);
+
       // Create marker with popup
-      new mapboxgl.Marker()
+      new maptilersdk.Marker({ color: "#FF0000" })
         .setLngLat([entry.station.longitude, entry.station.latitude])
-        .setPopup(new mapboxgl.Popup().setDOMContent(popupNode))
+        .setPopup(popup)
         .addTo(mapInstance);
     });
   }, [validEntries, mapLoaded]);
