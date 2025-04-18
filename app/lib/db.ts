@@ -31,6 +31,9 @@ export interface Station {
   priceClass: number; // 1-7
   state: string;
   pointValue: number;
+  latitude?: number;
+  longitude?: number;
+  operator?: string;
 }
 
 // User's collection entry
@@ -47,6 +50,8 @@ export interface CollectionStats {
   totalStations: number;
   lastUpdated: number;
   firstLaunch: boolean;
+  priceClassStats: { [key: number]: { collected: number; total: number } };
+  stationsThisMonth: number;
 }
 
 const DB_NAME = "bahnhofjaeger-db";
@@ -111,7 +116,14 @@ export async function initializeStats(): Promise<CollectionStats> {
       totalStations: 0,
       lastUpdated: Date.now(),
       firstLaunch: true,
+      priceClassStats: {},
+      stationsThisMonth: 0,
     };
+    await store.put(stats);
+  } else if (!stats.priceClassStats || !("stationsThisMonth" in stats)) {
+    // Add new fields to existing stats object if they don't exist
+    stats.priceClassStats = stats.priceClassStats || {};
+    stats.stationsThisMonth = stats.stationsThisMonth || 0;
     await store.put(stats);
   }
 

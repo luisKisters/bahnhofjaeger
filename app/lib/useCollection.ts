@@ -24,6 +24,8 @@ export function useCollection() {
       totalStations: 0,
       lastUpdated: 0,
       firstLaunch: false,
+      priceClassStats: {},
+      stationsThisMonth: 0,
     },
     error: null,
   });

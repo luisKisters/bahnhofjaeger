@@ -66,7 +66,7 @@
 - [ ] Social sharing
 - [ ] Leaderboard
 - [ ] Mutiplayer
-- [ ] Map "enrichment" with additional station data
+- [ ] Database/CSV "enrichment" with additional station data
 - [ ] Statistic (visited e.g "21/240 Stations")
 - [ ] Stop using next-pwa and follow more: https://nextjs.org/docs/app/building-your-application/configuring/progressive-web-apps
 
@@ -74,3 +74,5 @@
 
 - [ ] fix pwa images for fancy installer thingy to work
 - [ ] fix station names in csv
+- [ ] make the fuzzy search work better and display loading state
+- [ ] add bundesland filter

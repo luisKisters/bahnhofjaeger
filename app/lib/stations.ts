@@ -15,10 +15,13 @@ function parseStationRow(row: any): Station | null {
     // Log each row for debugging
     console.log("Parsing row:", row);
 
-    // The specific format of our CSV has these columns
-    const name = row.Bahnhof;
-    const priceClassStr = row["Preis-klasse"];
-    const state = row.Bundesland;
+    // Map to the actual CSV column names
+    const name = row.name || row.Serviceeinrichtung_df0;
+    const priceClassStr = row.Category_df0;
+    const state = row.State_df0;
+    const operator = row.Code_df0;
+    const latitude = parseFloat(row["@lat"]);
+    const longitude = parseFloat(row["@lon"]);
 
     // Skip invalid rows
     if (!name) {
@@ -46,6 +49,9 @@ function parseStationRow(row: any): Station | null {
       priceClass,
       state: state?.trim() || "Unknown",
       pointValue: calculatePoints(priceClass),
+      latitude: isNaN(latitude) ? undefined : latitude,
+      longitude: isNaN(longitude) ? undefined : longitude,
+      operator: operator?.trim(),
     };
   } catch (error) {
     console.error("Error parsing row:", error, row);
@@ -119,6 +125,11 @@ async function storeStations(stations: Station[]): Promise<void> {
     const db = await getDB();
     const tx = db.transaction("stations", "readwrite");
 
+    // Clear existing stations first
+    console.log("Clearing existing stations...");
+    await tx.store.clear();
+    console.log("Existing stations cleared");
+
     // Add all stations
     let count = 0;
     for (const station of stations) {
@@ -146,8 +157,8 @@ export async function fetchAndProcessStations(): Promise<number> {
   try {
     console.log("Attempting to fetch CSV file...");
 
-    // Try directly from the public directory root
-    const response = await fetch("/Stationspreisliste_2025_extracted.csv");
+    // Fix the path to match the actual location
+    const response = await fetch("/data/combined_station_matches.csv");
 
     if (!response.ok) {
       console.error(

@@ -6,13 +6,27 @@ export function calculateSimilarity(str1: string, str2: string): number {
   const s1 = str1.toLowerCase();
   const s2 = str2.toLowerCase();
 
-  // If one is a substring of the other, give a high score
-  if (s1.includes(s2) || s2.includes(s1)) {
-    // The closer in length, the higher the score
-    const lengthRatio =
-      Math.min(s1.length, s2.length) / Math.max(s1.length, s2.length);
-    // Give more weight to this type of match
-    return 0.7 + 0.3 * lengthRatio;
+  // Exact match gets perfect score
+  if (s1 === s2) {
+    return 1.0;
+  }
+
+  // Starting with the search term gets very high score
+  if (s1.startsWith(s2)) {
+    return 0.9 + 0.1 * (s2.length / s1.length);
+  }
+
+  // If search term is in the station name (but not at start)
+  if (s1.includes(s2)) {
+    // The closer to the beginning, the higher the score
+    const position = s1.indexOf(s2);
+    const positionPenalty = position / s1.length;
+    return 0.8 - 0.3 * positionPenalty;
+  }
+
+  // If station name is in the search term
+  if (s2.includes(s1)) {
+    return 0.7 * (s1.length / s2.length);
   }
 
   // Otherwise calculate a more complex similarity
@@ -44,15 +58,21 @@ export function calculateSimilarity(str1: string, str2: string): number {
   const wordScore = wordMatches / Math.max(wordSet1.size, wordSet2.size);
 
   // Weight word matches more heavily
-  return charScore * 0.4 + wordScore * 0.6;
+  return 0.1 + charScore * 0.3 + wordScore * 0.5;
 }
 
 // Search stations with fuzzy matching and return results sorted by relevance
+export interface StationWithScore {
+  station: Station;
+  score: number;
+  matchScore: number;
+}
+
 export function fuzzySearchStations(
   stations: Station[],
   query: string,
   limit = 10
-): Station[] {
+): StationWithScore[] {
   if (!query.trim()) {
     return [];
   }
@@ -61,17 +81,47 @@ export function fuzzySearchStations(
 
   // Map stations to [station, score] pairs
   const scored = stations.map((station) => {
-    const score = calculateSimilarity(station.name, normalizedQuery);
-    return { station, score };
+    // Base score from text matching
+    const matchScore = calculateSimilarity(station.name, normalizedQuery);
+
+    // Normalize point value to 0-1 range (assuming max point value of 70)
+    // Higher priceClass stations get priority when match scores are similar
+    const pointScore = station.pointValue / 70;
+
+    // Boost for main stations (Hauptbahnhof/Hbf)
+    let mainStationBoost = 0;
+    const lowerName = station.name.toLowerCase();
+
+    // Comprehensive check for main stations with proper word boundaries
+    if (
+      lowerName.includes("hauptbahnhof") ||
+      lowerName.includes(" hbf") ||
+      lowerName.endsWith(" hbf") ||
+      lowerName.includes("hbf ") ||
+      lowerName === "hbf"
+    ) {
+      // Give a significant boost to main stations
+      mainStationBoost = 0.15;
+    }
+
+    // Combined score: 70% match quality, 15% point value, 15% main station boost
+    const combinedScore =
+      matchScore * 0.7 + pointScore * 0.15 + mainStationBoost;
+
+    return {
+      station,
+      score: combinedScore,
+      matchScore, // Keep original match score for reference
+    };
   });
 
   // Filter to include only stations with a minimum similarity
   const MIN_SIMILARITY = 0.3;
-  const filtered = scored.filter((item) => item.score >= MIN_SIMILARITY);
+  const filtered = scored.filter((item) => item.matchScore >= MIN_SIMILARITY);
 
-  // Sort by score (descending)
+  // Sort by combined score (descending)
   const sorted = filtered.sort((a, b) => b.score - a.score);
 
-  // Return the top N results
-  return sorted.slice(0, limit).map((item) => item.station);
+  // Return the top N results with scores
+  return sorted.slice(0, limit);
 }

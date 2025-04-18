@@ -4,15 +4,23 @@ import React, { useState } from "react";
 import Layout from "@/app/components/Layout";
 import StatsCard from "@/app/components/StatsCard";
 import StationCard from "@/app/components/StationCard";
+import StationMap from "@/app/components/StationMap";
 import { useCollection } from "@/app/lib/useCollection";
+import dynamic from "next/dynamic";
 
 // Filter options
 type SortOption = "newest" | "oldest" | "points-high" | "points-low" | "name";
+
+// Dynamically import the map component with no SSR to avoid leaflet issues
+const DynamicStationMap = dynamic(() => import("@/app/components/StationMap"), {
+  ssr: false,
+});
 
 export default function CollectionPage() {
   const { isLoading, entries, stats, error, removeStation, refreshCollection } =
     useCollection();
   const [sortOption, setSortOption] = useState<SortOption>("newest");
+  const [viewMode, setViewMode] = useState<"list" | "map">("list");
 
   // Handle removing a station
   const handleRemoveStation = async (stationId: string) => {
@@ -48,26 +56,61 @@ export default function CollectionPage() {
         {/* Stats Card */}
         <StatsCard stats={stats} />
 
-        {/* Sort Options */}
+        {/* View toggle */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-4">
-          <label
-            htmlFor="sort"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Sort by:
-          </label>
-          <select
-            id="sort"
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value as SortOption)}
-            className="block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="points-high">Highest Points</option>
-            <option value="points-low">Lowest Points</option>
-            <option value="name">Station Name</option>
-          </select>
+          <div className="flex justify-between items-center">
+            <div>
+              <label
+                htmlFor="sort"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Sort by:
+              </label>
+              <select
+                id="sort"
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value as SortOption)}
+                className="block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="points-high">Highest Points</option>
+                <option value="points-low">Lowest Points</option>
+                <option value="name">Station Name</option>
+              </select>
+            </div>
+
+            <div className="ml-4">
+              <label
+                htmlFor="viewMode"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                View:
+              </label>
+              <div className="flex border border-gray-300 rounded-md overflow-hidden">
+                <button
+                  className={`px-4 py-2 ${
+                    viewMode === "list"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-100"
+                  }`}
+                  onClick={() => setViewMode("list")}
+                >
+                  List
+                </button>
+                <button
+                  className={`px-4 py-2 ${
+                    viewMode === "map"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-100"
+                  }`}
+                  onClick={() => setViewMode("map")}
+                >
+                  Map
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Error message */}
@@ -94,8 +137,13 @@ export default function CollectionPage() {
           </div>
         )}
 
+        {/* Map View */}
+        {viewMode === "map" && !isLoading && entries.length > 0 && (
+          <DynamicStationMap entries={sortedEntries} />
+        )}
+
         {/* Collection list */}
-        {sortedEntries.length > 0 && (
+        {viewMode === "list" && sortedEntries.length > 0 && (
           <div>
             {sortedEntries.map((entry) => (
               <StationCard

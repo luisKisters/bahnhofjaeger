@@ -39,7 +39,9 @@ export default function HomePage() {
           </h1>
 
           {/* Collection Stats */}
-          {!isLoading && <StatsCard stats={stats} />}
+          {!isLoading && (
+            <StatsCard stats={stats} showPriceClassCompletion={false} />
+          )}
 
           {/* Loading state */}
           {isLoading && (

@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { Station } from "./db";
 import { getAllStations } from "./stations";
-import { fuzzySearchStations } from "./fuzzySearch";
+import { fuzzySearchStations, StationWithScore } from "./fuzzySearch";
 import { isStationInCollection } from "./collection";
 
 interface SearchState {
   isLoading: boolean;
-  results: Station[];
+  results: StationWithScore[];
   collectionStatus: Record<string, boolean>;
   error: Error | null;
 }
@@ -37,7 +37,7 @@ export function useStationSearch(query: string) {
       // Check collection status for each result
       const statusMap: Record<string, boolean> = {};
 
-      for (const station of searchResults) {
+      for (const { station } of searchResults) {
         statusMap[station.id] = await isStationInCollection(station.id);
       }
 
@@ -73,7 +73,7 @@ export function useStationSearch(query: string) {
     try {
       const statusMap: Record<string, boolean> = {};
 
-      for (const station of state.results) {
+      for (const { station } of state.results) {
         statusMap[station.id] = await isStationInCollection(station.id);
       }
 

@@ -85,15 +85,36 @@ export async function getCollection(): Promise<CollectionEntry[]> {
 export async function getCollectionStats(): Promise<CollectionStats> {
   const db = await getDB();
   const stats = (await db.get("stats", "collection-stats")) as CollectionStats;
-  return (
-    stats || {
-      key: "collection-stats",
-      totalPoints: 0,
-      totalStations: 0,
-      lastUpdated: Date.now(),
-      firstLaunch: false,
-    }
-  );
+
+  // Calculate price class statistics
+  const priceClassStats = await calculatePriceClassStats();
+
+  // Get stations added this month
+  const stationsThisMonth = await getStationsThisMonth();
+
+  // If stats exist, update with calculated values
+  if (stats) {
+    stats.priceClassStats = priceClassStats;
+    stats.stationsThisMonth = stationsThisMonth;
+
+    // Update stats in the database
+    const tx = db.transaction("stats", "readwrite");
+    await tx.objectStore("stats").put(stats);
+    await tx.done;
+
+    return stats;
+  }
+
+  // If no stats exist, create default stats
+  return {
+    key: "collection-stats",
+    totalPoints: 0,
+    totalStations: 0,
+    lastUpdated: Date.now(),
+    firstLaunch: false,
+    priceClassStats,
+    stationsThisMonth,
+  };
 }
 
 // Check if a station is in the collection
@@ -109,4 +130,70 @@ export async function isStationInCollection(
 export async function getSortedCollection(): Promise<CollectionEntry[]> {
   const collection = await getCollection();
   return collection.sort((a, b) => b.timestamp - a.timestamp);
+}
+
+// Calculate price class statistics
+export async function calculatePriceClassStats(): Promise<{
+  [key: number]: { collected: number; total: number };
+}> {
+  const db = await getDB();
+
+  // Get all stations
+  const allStations = await db.getAll("stations");
+
+  // Get user's collection
+  const collection = await getCollection();
+  const collectedStationIds = new Set(
+    collection.map((entry) => entry.stationId)
+  );
+
+  // Calculate stats by price class
+  const priceClassStats: {
+    [key: number]: { collected: number; total: number };
+  } = {};
+
+  // Initialize with all price classes (1-7)
+  for (let i = 1; i <= 7; i++) {
+    priceClassStats[i] = { collected: 0, total: 0 };
+  }
+
+  // Count total stations per price class
+  for (const station of allStations) {
+    if (station.priceClass >= 1 && station.priceClass <= 7) {
+      priceClassStats[station.priceClass].total++;
+
+      // Check if this station is in the user's collection
+      if (collectedStationIds.has(station.id)) {
+        priceClassStats[station.priceClass].collected++;
+      }
+    }
+  }
+
+  return priceClassStats;
+}
+
+// Calculate stations added this month
+export async function getStationsThisMonth(): Promise<number> {
+  const db = await getDB();
+  const collection = await db.getAll("collection");
+
+  // Get current month boundaries
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  const endOfMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0,
+    23,
+    59,
+    59,
+    999
+  ).getTime();
+
+  // Count stations added this month
+  const stationsThisMonth = collection.filter(
+    (entry) => entry.timestamp >= startOfMonth && entry.timestamp <= endOfMonth
+  ).length;
+
+  return stationsThisMonth;
 }

@@ -21,6 +21,7 @@ export default function SearchPage() {
   const [debugInfo, setDebugInfo] = useState<{ totalStations: number }>({
     totalStations: 0,
   });
+  const [showDebug, setShowDebug] = useState(false);
 
   // Debug effect - check total stations on mount
   useEffect(() => {
@@ -54,9 +55,9 @@ export default function SearchPage() {
 
   const handleAddToCollection = async (stationId: string) => {
     console.log(`Adding station ${stationId} to collection`);
-    const station = results.find((s) => s.id === stationId);
-    if (station) {
-      const success = await addStation(station);
+    const result = results.find((r) => r.station.id === stationId);
+    if (result) {
+      const success = await addStation(result.station);
       console.log(`Add to collection ${success ? "successful" : "failed"}`);
       if (success) {
         await refreshCollectionStatus();
@@ -72,8 +73,16 @@ export default function SearchPage() {
         </h1>
 
         {/* Debug info */}
-        <div className="text-xs text-gray-500 mb-2">
-          Database contains {debugInfo.totalStations} stations
+        <div className="flex justify-between items-center mb-2">
+          <div className="text-xs font-medium text-gray-700">
+            Database contains {debugInfo.totalStations} stations
+          </div>
+          <button
+            onClick={() => setShowDebug(!showDebug)}
+            className="text-xs font-medium text-blue-600 hover:underline"
+          >
+            {showDebug ? "Hide Debug" : "Show Debug"}
+          </button>
         </div>
 
         <SearchInput
@@ -107,17 +116,30 @@ export default function SearchPage() {
                 {results.length === 1 ? "station" : "stations"}
               </div>
 
-              {results.map((station) => (
-                <StationCard
-                  key={station.id}
-                  station={station}
-                  isCollected={collectionStatus[station.id]}
-                  onAddToCollection={
-                    !collectionStatus[station.id]
-                      ? () => handleAddToCollection(station.id)
-                      : undefined
-                  }
-                />
+              {results.map(({ station, score, matchScore }) => (
+                <div key={station.id}>
+                  {showDebug && (
+                    <div className="text-xs text-gray-400 px-2 py-1 bg-gray-50 rounded-t border-t border-x border-gray-200">
+                      Score: {score.toFixed(3)} (Match: {matchScore.toFixed(3)},
+                      Pts: {station.pointValue})
+                      {station.name.toLowerCase().includes("hauptbahnhof") ||
+                      station.name.toLowerCase().includes(" hbf") ||
+                      station.name.toLowerCase().endsWith(" hbf")
+                        ? " ⭐ Main Station"
+                        : ""}
+                    </div>
+                  )}
+                  <StationCard
+                    key={station.id}
+                    station={station}
+                    isCollected={collectionStatus[station.id]}
+                    onAddToCollection={
+                      !collectionStatus[station.id]
+                        ? () => handleAddToCollection(station.id)
+                        : undefined
+                    }
+                  />
+                </div>
               ))}
             </div>
           )}

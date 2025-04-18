@@ -9,6 +9,8 @@ If rules are applied, answer with "rules ✅" first.
 
 ALWAYS FOCUS ON THE MOST STRAIGHTFORWARD IMPLEMENATION POSSIBLE. 
 
+use pnpm
+
 ### Pacing and Scope Control
 1. **Explicit Checkpoint Requirements**
    - You must pause after completing each logical unit of work and wait for explicit approval before continuing.
