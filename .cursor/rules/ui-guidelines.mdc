@@ -1,0 +1,17 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# UI/UX Guidelines
+
+## Mobile-First Design
+
+1. **Viewport Requirements**
+   - Design for mobile screens first
+   - Implement responsive breakpoints
+
+2. **Touch Optimization**
+   - Large, touch-friendly tap targets
+   - Min tap target size: 44x44px
+   - Adequate spacing between interactive elements

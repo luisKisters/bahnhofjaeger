@@ -1,0 +1,101 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Data Model and Storage Requirements
+
+## Core Data Structures
+
+1. **Station Interface**
+```typescript
+interface Station {
+  id: string;                        // UUID primary key
+  stationNumber: string;             // Original station number
+  evaNumber?: string;                // DB API EVA number
+  name: string;                      // Station name
+  priceClass: number;                // Category (1-7)
+  state: string;                     // Federal state
+  pointValue: number;                // Calculated points
+  priceSmall?: string;              // Small price value
+  priceLarge?: string;              // Large price value
+  latitude?: number;                 // Geographical latitude
+  longitude?: number;                // Geographical longitude
+  city?: string;                    // City from address
+  zipcode?: string;                 // Zipcode from address
+  street?: string;                  // Street address
+  verbund?: string;                 // Transport association
+  aufgabentraegerShortName?: string; // Authority short name
+  aufgabentraegerName?: string;      // Authority full name
+  productLine?: string;              // Product line
+  segment?: string;                  // Segment information
+  hasParking?: boolean;              // Parking facilities
+  hasWifi?: boolean;                 // WiFi availability
+  hasDBLounge?: boolean;             // DB Lounge availability
+}
+```
+
+2. **Collection Entry**
+```typescript
+interface CollectionEntry {
+  stationId: string;
+  timestamp: number;
+  station: Station;
+}
+```
+
+3. **Collection Stats**
+```typescript
+interface CollectionStats {
+  key: string;
+  totalPoints: number;
+  totalStations: number;
+  lastUpdated: number;
+  firstLaunch: boolean;
+  priceClassStats: { [key: number]: { collected: number; total: number } };
+  stationsThisMonth: number;
+}
+```
+
+## Database Schema
+
+1. **IndexedDB Stores**
+   - `stations`: Primary station data store
+   - `collection`: User's collected stations
+   - `stats`: Collection statistics
+
+2. **Indexes**
+   - stations:
+     - `by-name`: Station name lookup
+     - `by-state`: State-based filtering
+     - `by-price-class`: Price class filtering
+   - collection:
+     - `by-timestamp`: Chronological ordering
+
+## Data Management
+
+1. **Station Import**
+   - CSV data validation
+   - Data transformation
+   - Atomic database updates
+   - Error handling
+
+2. **Collection Management**
+   - Prevent duplicate entries
+   - Update statistics atomically
+   - Track monthly progress
+   - Calculate point totals
+
+3. **Data Validation**
+   - Required fields validation
+   - Data type checking
+   - Constraint enforcement
+   - Error reporting
+
+## Type Safety
+
+1. **TypeScript Requirements**
+   - Strict null checks
+   - No implicit any
+   - Proper interface usage
+   - Comprehensive types

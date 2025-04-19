@@ -1,0 +1,73 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Library Implementation Guidelines
+
+## Core Files Overview
+
+1. **Database Layer** - [app/lib/db.ts](mdc:app/lib/db.ts)
+   - IndexedDB implementation using `idb` library
+   - Schema definition for stations, collection, and stats
+   - Database initialization and version management
+   - Stats tracking for collection progress
+
+2. **Station Management** - [app/lib/stations.ts](mdc:app/lib/stations.ts)
+   - CSV data import and parsing
+   - Station data validation and transformation
+   - Point calculation logic
+   - Station search functionality
+
+3. **Collection Management** - [app/lib/collection.ts](mdc:app/lib/collection.ts)
+   - User collection state management
+   - Collection statistics tracking
+   - Station check-in functionality
+
+4. **Search Implementation** - [app/lib/fuzzySearch.ts](mdc:app/lib/fuzzySearch.ts)
+   - Fuzzy search algorithm for station names
+   - Search result ranking and sorting
+   - Performance optimization for large datasets
+
+## React Hooks
+
+1. **useCollection** - [app/lib/useCollection.ts](mdc:app/lib/useCollection.ts)
+   - Collection state management hook
+   - Real-time collection updates
+   - Collection statistics
+
+2. **useStationSearch** - [app/lib/useStationSearch.ts](mdc:app/lib/useStationSearch.ts)
+   - Station search hook with debouncing
+   - Search results caching
+   - Error handling
+
+3. **useInitialization** - [app/lib/useInitialization.ts](mdc:app/lib/useInitialization.ts)
+   - App initialization logic
+   - First-time setup handling
+   - Data import management
+
+## Implementation Requirements
+
+1. **Database Operations**
+   - All DB operations must be atomic
+   - Implement proper error handling
+   - Use TypeScript for type safety
+   - Handle offline scenarios
+
+2. **State Management**
+   - Use React hooks for state
+   - Implement proper cleanup
+   - Handle concurrent updates
+   - Cache results when appropriate
+
+3. **Performance Guidelines**
+   - Optimize search operations
+   - Implement proper indexing
+   - Use efficient data structures
+   - Cache frequently accessed data
+
+4. **Error Handling**
+   - Graceful error recovery
+   - User-friendly error messages
+   - Proper error logging
+   - Data validation
