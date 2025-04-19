@@ -44,11 +44,52 @@ export default function StationCard({
           <p className="text-sm text-gray-600">
             Price Class: {station.priceClass} · State: {station.state}
           </p>
-          {station.operator && (
+
+          {/* Show additional information from enriched data */}
+          {station.productLine && (
             <p className="text-sm text-gray-600">
-              Operator: {station.operator}
+              Type: {station.productLine}
+              {station.segment && ` (${station.segment})`}
             </p>
           )}
+
+          {station.city && (
+            <p className="text-sm text-gray-600">
+              {station.city}
+              {station.zipcode && `, ${station.zipcode}`}
+              {station.street && ` · ${station.street}`}
+            </p>
+          )}
+
+          {station.aufgabentraegerShortName && (
+            <p className="text-sm text-gray-600">
+              Operator: {station.aufgabentraegerShortName}
+            </p>
+          )}
+
+          {/* Show amenities */}
+          <div className="mt-1 text-sm text-gray-600">
+            {(station.hasWifi || station.hasParking || station.hasDBLounge) && (
+              <div className="flex flex-wrap gap-1 mt-1">
+                {station.hasWifi && (
+                  <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full text-xs">
+                    WiFi
+                  </span>
+                )}
+                {station.hasParking && (
+                  <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded-full text-xs">
+                    Parking
+                  </span>
+                )}
+                {station.hasDBLounge && (
+                  <span className="bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded-full text-xs">
+                    DB Lounge
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="flex items-center mt-1">
             <p className="text-sm font-bold text-blue-700">
               {station.pointValue} Points

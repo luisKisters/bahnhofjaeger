@@ -24,16 +24,30 @@ interface BahnhofjaegerDB extends DBSchema {
   };
 }
 
-// Station data from CSV
+// Station data from enriched CSV
 export interface Station {
-  id: string;
-  name: string;
-  priceClass: number; // 1-7
-  state: string;
-  pointValue: number;
-  latitude?: number;
-  longitude?: number;
-  operator?: string;
+  id: string; // UUID is now the primary identifier
+  stationNumber: string; // Original station number
+  evaNumber?: string; // DB API EVA number
+  name: string; // Station name
+  priceClass: number; // Category (1-7)
+  state: string; // Federal state
+  pointValue: number; // Calculated points value
+  priceSmall?: string; // Small price value
+  priceLarge?: string; // Large price value
+  latitude?: number; // Geographical latitude
+  longitude?: number; // Geographical longitude
+  city?: string; // City from address
+  zipcode?: string; // Zipcode from address
+  street?: string; // Street address
+  verbund?: string; // Original verbund value
+  aufgabentraegerShortName?: string; // Aufgabentraeger short name
+  aufgabentraegerName?: string; // Aufgabentraeger full name
+  productLine?: string; // Product line (e.g. "Knotenbahnhof")
+  segment?: string; // Segment information
+  hasParking?: boolean; // Has parking facilities
+  hasWifi?: boolean; // Has WiFi
+  hasDBLounge?: boolean; // Has DB Lounge
 }
 
 // User's collection entry

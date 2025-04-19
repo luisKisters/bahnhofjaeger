@@ -1,5 +1,4 @@
 import Papa from "papaparse";
-import { v4 as uuidv4 } from "uuid";
 import { Station, getDB } from "./db";
 
 // Calculate point value based on price class
@@ -9,21 +8,41 @@ function calculatePoints(priceClass: number): number {
   return (8 - priceClass) * 10;
 }
 
-// Parse CSV row to Station object
+// Parse CSV row to Station object from enriched data
 function parseStationRow(row: any): Station | null {
   try {
     // Log each row for debugging
     console.log("Parsing row:", row);
 
-    // Map to the actual CSV column names
-    const name = row.name || row.Serviceeinrichtung_df0;
-    const priceClassStr = row.Category_df0;
-    const state = row.State_df0;
-    const operator = row.Code_df0;
-    const latitude = parseFloat(row["@lat"]);
-    const longitude = parseFloat(row["@lon"]);
+    // Map to the enriched CSV column schema
+    const uuid = row.UUID;
+    const stationNumber = row.Station_Number;
+    const evaNumber = row.EVA_Number;
+    const name = row.Name;
+    const priceClassStr = row.Category;
+    const state = row.Federal_State;
+    const priceSmall = row.Price_Small;
+    const priceLarge = row.Price_Large;
+    const longitude = parseFloat(row.Longitude);
+    const latitude = parseFloat(row.Latitude);
+    const city = row.City;
+    const zipcode = row.Zipcode;
+    const street = row.Street;
+    const verbund = row.Verbund;
+    const aufgabentraegerShortName = row.Aufgabentraeger_ShortName;
+    const aufgabentraegerName = row.Aufgabentraeger_Name;
+    const productLine = row.ProductLine;
+    const segment = row.Segment;
+    const hasParking = row.HasParking === "true";
+    const hasWifi = row.HasWiFi === "true";
+    const hasDBLounge = row.HasDBLounge === "true";
 
     // Skip invalid rows
+    if (!uuid) {
+      console.log("Row missing UUID");
+      return null;
+    }
+
     if (!name) {
       console.log("Row missing station name");
       return null;
@@ -35,7 +54,6 @@ function parseStationRow(row: any): Station | null {
     }
 
     // Convert price class to number and validate
-    // Replace any commas with periods for proper parsing
     const priceClass = parseInt(priceClassStr.toString().trim(), 10);
     if (isNaN(priceClass) || priceClass < 1 || priceClass > 7) {
       console.log(`Invalid price class: "${priceClassStr}"`);
@@ -44,14 +62,28 @@ function parseStationRow(row: any): Station | null {
 
     // Create and return the station object
     return {
-      id: uuidv4(), // Generate unique ID
+      id: uuid.trim(),
+      stationNumber: stationNumber || "",
+      evaNumber: evaNumber || undefined,
       name: name.trim(),
       priceClass,
       state: state?.trim() || "Unknown",
       pointValue: calculatePoints(priceClass),
+      priceSmall,
+      priceLarge,
       latitude: isNaN(latitude) ? undefined : latitude,
       longitude: isNaN(longitude) ? undefined : longitude,
-      operator: operator?.trim(),
+      city,
+      zipcode,
+      street,
+      verbund,
+      aufgabentraegerShortName,
+      aufgabentraegerName,
+      productLine,
+      segment,
+      hasParking,
+      hasWifi,
+      hasDBLounge,
     };
   } catch (error) {
     console.error("Error parsing row:", error, row);
@@ -157,8 +189,8 @@ export async function fetchAndProcessStations(): Promise<number> {
   try {
     console.log("Attempting to fetch CSV file...");
 
-    // Fix the path to match the actual location
-    const response = await fetch("/data/combined_station_matches.csv");
+    // Update path to use the enriched data file
+    const response = await fetch("/data/station-data.csv");
 
     if (!response.ok) {
       console.error(
