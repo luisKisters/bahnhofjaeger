@@ -24,7 +24,8 @@ const DynamicStationMap = dynamic(() => import("@/app/components/StationMap"), {
 });
 
 export default function CollectionPage() {
-  const { isLoading, entries, stats, error, removeStation } = useCollection();
+  const { isLoading, entries, stats, error, removeStation, refreshCollection } =
+    useCollection();
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
 
@@ -34,6 +35,11 @@ export default function CollectionPage() {
     if (success) {
       // Collection will be automatically refreshed via the hook
     }
+  };
+
+  // Handle collection updates from the map
+  const handleCollectionUpdated = () => {
+    refreshCollection();
   };
 
   // Sort the collection based on the selected option
@@ -151,7 +157,10 @@ export default function CollectionPage() {
 
         {/* Map view */}
         {viewMode === "map" && !isLoading && entries.length > 0 && (
-          <DynamicStationMap entries={sortedEntries} />
+          <DynamicStationMap
+            entries={sortedEntries}
+            onCollectionUpdated={handleCollectionUpdated}
+          />
         )}
 
         {/* Collection list */}

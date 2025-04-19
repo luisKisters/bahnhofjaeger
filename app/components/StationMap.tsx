@@ -11,9 +11,13 @@ maptilersdk.config.apiKey = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || "";
 
 interface StationMapProps {
   entries: CollectionEntry[];
+  onCollectionUpdated?: () => void;
 }
 
-export default function StationMap({ entries }: StationMapProps) {
+export default function StationMap({
+  entries,
+  onCollectionUpdated,
+}: StationMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -21,9 +25,22 @@ export default function StationMap({ entries }: StationMapProps) {
   const [loading, setLoading] = useState(true);
   const [mapInitialized, setMapInitialized] = useState(false);
   const markersRef = useRef<maptilersdk.Marker[]>([]);
+  const [showUncollected, setShowUncollected] = useState(true);
+  const [addingToCollection, setAddingToCollection] = useState<string | null>(
+    null
+  );
 
   // Create a Set of collected station IDs for quick lookups
-  const collectedStationIds = new Set(entries.map((entry) => entry.stationId));
+  const collectedStationIdsRef = useRef(
+    new Set(entries.map((entry) => entry.stationId))
+  );
+
+  // Update collected stations when entries change
+  useEffect(() => {
+    collectedStationIdsRef.current = new Set(
+      entries.map((entry) => entry.stationId)
+    );
+  }, [entries]);
 
   // Get valid entries from collection (those with coordinates)
   const validCollectionEntries = entries.filter(
@@ -41,8 +58,8 @@ export default function StationMap({ entries }: StationMapProps) {
     // Base scale from price class
     const baseScale = 0.5 + invertedScale * 0.1;
 
-    // Apply collection status multiplier
-    return isCollected ? baseScale * 1.3 : baseScale * 0.85;
+    // Apply collection status multiplier (slightly smaller for collected stations)
+    return isCollected ? baseScale * 1.2 : baseScale * 0.85;
   };
 
   // Function to create a custom HTML marker element
@@ -62,6 +79,15 @@ export default function StationMap({ entries }: StationMapProps) {
 
     // Create the marker element
     const el = document.createElement("div");
+
+    // Create a wrapper with slightly larger clickable area (tiny invisible padding)
+    const wrapper = document.createElement("div");
+    wrapper.style.width = `${size + 2}px`; // Just 1px extra on each side
+    wrapper.style.height = `${size + 2}px`;
+    wrapper.style.display = "flex";
+    wrapper.style.justifyContent = "center";
+    wrapper.style.alignItems = "center";
+    wrapper.style.cursor = "pointer"; // Change cursor on hover
 
     // Style the marker
     el.style.width = `${size}px`;
@@ -89,7 +115,123 @@ export default function StationMap({ entries }: StationMapProps) {
       el.style.zIndex = "1000";
     }
 
-    return el;
+    wrapper.appendChild(el);
+    return wrapper;
+  };
+
+  // Function to add a station to collection
+  const addStationToCollection = async (stationId: string) => {
+    try {
+      const response = await fetch("/api/collection/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ stationId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add station to collection");
+      }
+
+      // Add to local set to update UI immediately
+      collectedStationIdsRef.current.add(stationId);
+
+      // Notify parent if needed
+      if (onCollectionUpdated) {
+        onCollectionUpdated();
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error adding station to collection:", error);
+      throw error;
+    }
+  };
+
+  // Helper function to create popup content
+  const createPopupContent = (station: Station, isCollected: boolean) => {
+    const container = document.createElement("div");
+    container.className = "station-popup-content";
+    container.style.zIndex = "2000"; // Higher z-index to appear above markers
+
+    const html = `
+      <h3 class="font-medium">${station.name}</h3>
+      <p class="text-sm">Price Class: ${station.priceClass}</p>
+      <p class="text-sm">Points: ${station.pointValue}</p>
+      ${
+        station.operator
+          ? `<p class="text-sm">Operator: ${station.operator}</p>`
+          : ""
+      }
+      ${
+        isCollected
+          ? `<p class="text-sm text-green-600">In your collection</p>`
+          : `<p class="text-sm text-gray-500">Not collected yet</p>`
+      }
+    `;
+
+    container.innerHTML = html;
+
+    // Add collection button if not collected
+    if (!isCollected) {
+      const buttonContainer = document.createElement("div");
+      buttonContainer.className = "mt-2";
+
+      const button = document.createElement("button");
+      button.className =
+        "px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors";
+      button.textContent =
+        addingToCollection === station.id ? "Adding..." : "Add to Collection";
+      button.disabled = addingToCollection === station.id;
+
+      button.addEventListener("click", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (addingToCollection) return;
+
+        try {
+          setAddingToCollection(station.id);
+          button.textContent = "Adding...";
+          button.disabled = true;
+
+          await addStationToCollection(station.id);
+
+          // Update button to show success
+          button.textContent = "Added!";
+          button.className =
+            "px-2 py-1 bg-green-500 text-white text-xs rounded";
+
+          // Close popup after a moment
+          setTimeout(() => {
+            if (map.current) {
+              // Use a more compatible way to close popups
+              const popups = document.querySelectorAll(".maplibregl-popup");
+              popups.forEach((popup) => popup.remove());
+
+              // Refresh markers to show updated collection status
+              if (map.current.fire) {
+                map.current.fire("moveend");
+              }
+            }
+          }, 1500);
+        } catch (error) {
+          console.error("Failed to add station to collection:", error);
+          button.textContent = "Failed - Try Again";
+          button.className =
+            "px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors";
+          button.disabled = false;
+        } finally {
+          setAddingToCollection(null);
+        }
+      });
+
+      buttonContainer.appendChild(button);
+      container.appendChild(buttonContainer);
+    }
+
+    return container;
   };
 
   // Load all stations from database
@@ -212,6 +354,7 @@ export default function StationMap({ entries }: StationMapProps) {
 
     console.log("Adding markers to map");
     const mapInstance = map.current;
+    const maxMarkers = 400; // Limit maximum number of markers for performance
 
     // Clean up any previous markers first
     cleanupMarkers();
@@ -228,24 +371,31 @@ export default function StationMap({ entries }: StationMapProps) {
       ]);
     });
 
+    // Filter out uncollected stations if toggle is off
+    let filteredStations = visibleStations;
+    if (!showUncollected) {
+      filteredStations = visibleStations.filter((station) =>
+        collectedStationIdsRef.current.has(station.id)
+      );
+    }
+
     // If too many stations are visible, only show some based on price class
     // to avoid overloading the map with markers
-    let stationsToShow = visibleStations;
-    const maxMarkers = 400; // Limit maximum number of markers for performance
+    let stationsToShow = filteredStations;
 
-    if (visibleStations.length > maxMarkers) {
+    if (filteredStations.length > maxMarkers) {
       console.log(
-        `Too many stations (${visibleStations.length}), filtering to important ones`
+        `Too many stations (${filteredStations.length}), filtering to important ones`
       );
 
       // Always show collected stations
-      const collectedStations = visibleStations.filter((station) =>
-        collectedStationIds.has(station.id)
+      const collectedStations = filteredStations.filter((station) =>
+        collectedStationIdsRef.current.has(station.id)
       );
 
       // Then add higher price classes until we reach the limit
-      const uncollectedStations = visibleStations
-        .filter((station) => !collectedStationIds.has(station.id))
+      const uncollectedStations = filteredStations
+        .filter((station) => !collectedStationIdsRef.current.has(station.id))
         .sort((a, b) => a.priceClass - b.priceClass); // Sort by price class (ascending)
 
       // Calculate how many uncollected stations we can show
@@ -257,8 +407,8 @@ export default function StationMap({ entries }: StationMapProps) {
 
     // Sort stations so that collected ones are added last (will be on top)
     stationsToShow.sort((a, b) => {
-      const aCollected = collectedStationIds.has(a.id);
-      const bCollected = collectedStationIds.has(b.id);
+      const aCollected = collectedStationIdsRef.current.has(a.id);
+      const bCollected = collectedStationIdsRef.current.has(b.id);
 
       if (aCollected === bCollected) {
         // If both are collected or both are uncollected, sort by price class
@@ -276,36 +426,19 @@ export default function StationMap({ entries }: StationMapProps) {
       const latitude = station.latitude as number;
 
       // Check if station is in collection
-      const isCollected = collectedStationIds.has(station.id);
+      const isCollected = collectedStationIdsRef.current.has(station.id);
 
-      // Create popup content
-      const popupNode = document.createElement("div");
-      popupNode.innerHTML = `
-        <h3 class="font-medium">${station.name}</h3>
-        <p class="text-sm">Price Class: ${station.priceClass}</p>
-        <p class="text-sm">Points: ${station.pointValue}</p>
-        ${
-          station.operator
-            ? `<p class="text-sm">Operator: ${station.operator}</p>`
-            : ""
-        }
-        ${
-          isCollected
-            ? `<p class="text-sm text-green-600">In your collection</p>`
-            : `<p class="text-sm text-gray-500">Not collected yet</p>`
-        }
-      `;
+      // Create custom marker element
+      const markerElement = createCustomMarker(station, isCollected);
 
       // Create popup
       const popup = new maptilersdk.Popup({
         closeButton: true,
         closeOnClick: true,
-        offset: 10,
+        offset: 12, // Slightly larger offset to position above markers
         className: "station-popup",
-      }).setDOMContent(popupNode);
-
-      // Create custom marker element
-      const markerElement = createCustomMarker(station, isCollected);
+        maxWidth: "300px",
+      }).setDOMContent(createPopupContent(station, isCollected));
 
       // Create marker with popup
       const marker = new maptilersdk.Marker({
@@ -334,10 +467,18 @@ export default function StationMap({ entries }: StationMapProps) {
         ]);
       });
 
+      // Filter out uncollected stations if toggle is off
+      let filteredVisibleStations = newVisibleStations;
+      if (!showUncollected) {
+        filteredVisibleStations = newVisibleStations.filter((station) =>
+          collectedStationIdsRef.current.has(station.id)
+        );
+      }
+
       // Sort stations (collected ones last to be on top)
-      const sortedStations = [...newVisibleStations].sort((a, b) => {
-        const aCollected = collectedStationIds.has(a.id);
-        const bCollected = collectedStationIds.has(b.id);
+      const sortedStations = [...filteredVisibleStations].sort((a, b) => {
+        const aCollected = collectedStationIdsRef.current.has(a.id);
+        const bCollected = collectedStationIdsRef.current.has(b.id);
 
         if (aCollected === bCollected) {
           return a.priceClass - b.priceClass; // Lower price class on top
@@ -350,11 +491,11 @@ export default function StationMap({ entries }: StationMapProps) {
       let newStationsToShow = sortedStations;
       if (sortedStations.length > maxMarkers) {
         const collectedStations = sortedStations.filter((station) =>
-          collectedStationIds.has(station.id)
+          collectedStationIdsRef.current.has(station.id)
         );
 
         const uncollectedStations = sortedStations
-          .filter((station) => !collectedStationIds.has(station.id))
+          .filter((station) => !collectedStationIdsRef.current.has(station.id))
           .sort((a, b) => a.priceClass - b.priceClass);
 
         const remainingSlots = Math.max(
@@ -369,34 +510,17 @@ export default function StationMap({ entries }: StationMapProps) {
       newStationsToShow.forEach((station) => {
         const longitude = station.longitude as number;
         const latitude = station.latitude as number;
-        const isCollected = collectedStationIds.has(station.id);
+        const isCollected = collectedStationIdsRef.current.has(station.id);
         const markerElement = createCustomMarker(station, isCollected);
 
-        // Create marker with popup for popup interaction
-        const popupNode = document.createElement("div");
-        popupNode.innerHTML = `
-          <h3 class="font-medium">${station.name}</h3>
-          <p class="text-sm">Price Class: ${station.priceClass}</p>
-          <p class="text-sm">Points: ${station.pointValue}</p>
-          ${
-            station.operator
-              ? `<p class="text-sm">Operator: ${station.operator}</p>`
-              : ""
-          }
-          ${
-            isCollected
-              ? `<p class="text-sm text-green-600">In your collection</p>`
-              : `<p class="text-sm text-gray-500">Not collected yet</p>`
-          }
-        `;
-
-        // Create popup
+        // Create popup with collection functionality
         const popup = new maptilersdk.Popup({
           closeButton: true,
           closeOnClick: true,
-          offset: 10,
+          offset: 12, // Slightly larger offset
           className: "station-popup",
-        }).setDOMContent(popupNode);
+          maxWidth: "300px",
+        }).setDOMContent(createPopupContent(station, isCollected));
 
         const marker = new maptilersdk.Marker({
           element: markerElement,
@@ -417,7 +541,15 @@ export default function StationMap({ entries }: StationMapProps) {
       mapInstance.off("moveend", updateMarkers);
       cleanupMarkers();
     };
-  }, [allStations, mapLoaded, loading, collectedStationIds]);
+  }, [
+    allStations,
+    mapLoaded,
+    loading,
+    collectedStationIdsRef,
+    showUncollected,
+    onCollectionUpdated,
+    addingToCollection,
+  ]);
 
   if (loading) {
     return (
@@ -440,18 +572,35 @@ export default function StationMap({ entries }: StationMapProps) {
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-4">
       <h2 className="text-lg font-medium text-gray-800 mb-3">Station Map</h2>
-      <div className="mb-2 text-sm">
-        <span className="inline-block mr-4">
-          <span className="inline-block w-3 h-3 rounded-full bg-[#0066ff] mr-1"></span>{" "}
-          Collected
-        </span>
-        <span className="inline-block">
-          <span className="inline-block w-3 h-3 rounded-full bg-[#808080] mr-1"></span>{" "}
-          Not collected
-        </span>
-        <span className="ml-4 text-xs text-gray-500">
-          Larger markers = higher price class (lower number)
-        </span>
+      <div className="mb-2 text-sm flex items-center justify-between">
+        <div>
+          <span className="inline-block mr-4">
+            <span className="inline-block w-3 h-3 rounded-full bg-[#0066ff] mr-1"></span>{" "}
+            Collected
+          </span>
+          <span className="inline-block">
+            <span className="inline-block w-3 h-3 rounded-full bg-[#808080] mr-1"></span>{" "}
+            Not collected
+          </span>
+          <span className="ml-4 text-xs text-gray-500">
+            Larger markers = higher price class (lower number)
+          </span>
+        </div>
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="show-uncollected"
+            checked={showUncollected}
+            onChange={(e) => setShowUncollected(e.target.checked)}
+            className="mr-2 h-4 w-4 text-blue-500"
+          />
+          <label
+            htmlFor="show-uncollected"
+            className="text-sm text-gray-700 cursor-pointer"
+          >
+            Show uncollected stations
+          </label>
+        </div>
       </div>
       <div
         ref={mapContainer}
