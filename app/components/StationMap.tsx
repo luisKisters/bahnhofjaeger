@@ -160,8 +160,8 @@ export default function StationMap({
       <p class="text-sm">Price Class: ${station.priceClass}</p>
       <p class="text-sm">Points: ${station.pointValue}</p>
       ${
-        station.operator
-          ? `<p class="text-sm">Operator: ${station.operator}</p>`
+        station.aufgabentraegerShortName
+          ? `<p class="text-sm">Operator: ${station.aufgabentraegerShortName}</p>`
           : ""
       }
       ${
