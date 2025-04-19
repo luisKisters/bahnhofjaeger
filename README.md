@@ -2,7 +2,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+### Environment Setup
+
+1. Create a `.env.local` file in the root directory of the project and add your MapTiler API key:
+
+```bash
+# Get your API key from https://cloud.maptiler.com/
+NEXT_PUBLIC_MAPTILER_API_KEY=your_api_key_here
+```
+
+2. Then, run the development server:
 
 ```bash
 npm run dev
@@ -19,6 +28,52 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Map Features
+
+The application uses MapTiler SDK for displaying station maps. The map shows:
+
+- Blue markers for stations in your collection
+- Gray markers for stations not yet collected
+- Marker size based on station price class (higher classes = larger markers)
+
+## Station Data Enrichment
+
+This project includes a script to enrich Deutsche Bahn station data with additional information from the StaDa API.
+
+### Prerequisites
+
+1. Create a Deutsche Bahn API Marketplace account at https://developers.deutschebahn.com/
+2. Subscribe to the StaDa API (Free4All plan)
+3. Create a `.env` file with your API credentials:
+
+```
+DB_CLIENT_ID=your_db_client_id_here
+DB_SECRET=your_db_secret_here
+```
+
+### Running the Enrichment
+
+To test with a sample of 10 stations first:
+
+```bash
+pnpm enrich-stations-sample
+```
+
+To process the full dataset:
+
+```bash
+pnpm enrich-stations
+```
+
+The script will generate an enriched CSV file with additional data:
+
+- Geographic coordinates (longitude, latitude)
+- Address information
+- Aufgabentraeger details
+- Station type (ProductLine)
+- Facility information (parking, WiFi)
+- Unique IDs for each station
 
 ## Learn More
 

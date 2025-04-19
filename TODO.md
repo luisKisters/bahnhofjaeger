@@ -8,47 +8,47 @@
 
 ## 🔄 Data Management
 
-- [ ] Import CSV data on first launch
-- [ ] Store data in IndexedDB for offline access
-- [ ] Implement point calculation based on price class
-- [ ] Optimize Service Worker for offline cache
-- [ ] Implement local storage for collection
+- [x] Import CSV data on first launch
+- [x] Store data in IndexedDB for offline access
+- [x] Implement point calculation based on price class
+- [x] Optimize Service Worker for offline cache
+- [x] Implement local storage for collection
 
 ## 🔍 Station Search
 
-- [ ] Implement fuzzy-matching algorithm for search
+- [x] Implement fuzzy-matching algorithm for search
 - [ ] Create search suggestions with matching stations
 - [ ] Check for duplicates during check-in
 - [ ] Build compact UI for quick input
 
 ## 📱 UI/UX (Mobile-First)
 
-- [ ] Optimize main layout for mobile devices
-- [ ] Implement bottom navigation for easy access
+- [x] Optimize main layout for mobile devices
+- [x] Implement bottom navigation for easy access
 - [ ] Use adaptive font sizes and touch targets
 - [ ] Optimize input for mobile keyboard
 - [ ] Implement pull-to-refresh and swipe gestures
 
 ## 🏆 Collection
 
-- [ ] Create list of collected stations
-- [ ] Display total points
+- [x] Create list of collected stations
+- [x] Display total points
 - [ ] Implement sorting and filtering functions
 - [ ] Create detail view for individual stations
-- [ ] Add collection statistics
+- [x] Add collection statistics
 
 ## 🛠️ Technical Tasks
 
-- [ ] Complete PWA setup
-- [ ] Optimize Web App Manifest
-- [ ] Extend Service Worker for offline caching
+- [x] Complete PWA setup
+- [x] Optimize Web App Manifest
+- [x] Extend Service Worker for offline caching
 - [ ] Optimize app size
-- [ ] Implement offline error handling
+- [x] Implement offline error handling
 
 ## 🧪 Testing
 
 - [ ] Test on various mobile devices
-- [ ] Test offline functionality
+- [x] Test offline functionality
 - [ ] Perform performance tests
 - [ ] Conduct UI/UX tests with users
 
@@ -61,18 +61,22 @@
 ## 🌟 Future (after MVP)
 
 - [ ] GPS-based check-in
-- [ ] Map view
+- [x] Map view
 - [ ] Achievements
 - [ ] Social sharing
 - [ ] Leaderboard
 - [ ] Mutiplayer
 - [ ] Database/CSV "enrichment" with additional station data
-- [ ] Statistic (visited e.g "21/240 Stations")
+- [x] Statistic (visited e.g "21/240 Stations")
 - [ ] Stop using next-pwa and follow more: https://nextjs.org/docs/app/building-your-application/configuring/progressive-web-apps
 
 ## Other Todos
 
-- [ ] fix pwa images for fancy installer thingy to work
-- [ ] fix station names in csv
+- [x] fix pwa images for fancy installer thingy to work
+- [x] fix station names in csv
 - [ ] make the fuzzy search work better and display loading state
 - [ ] add bundesland filter
+- [ ] add slug pages preisklassen
+- [ ] change to bahn.de-like styling
+- [ ] fix "add to collection" button not working in map
+- [ ] change trainstation identifcation from name to id
