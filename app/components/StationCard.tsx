@@ -71,6 +71,11 @@ export default function StationCard({
           <div className="mt-1 text-sm text-gray-600">
             {(station.hasWifi || station.hasParking || station.hasDBLounge) && (
               <div className="flex flex-wrap gap-1 mt-1">
+                {station.isMainStation && (
+                  <span className="bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                    Main Station
+                  </span>
+                )}
                 {station.hasWifi && (
                   <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full text-xs">
                     WiFi

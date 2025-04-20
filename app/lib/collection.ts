@@ -89,12 +89,15 @@ export async function getCollectionStats(): Promise<CollectionStats> {
   // Calculate price class statistics
   const priceClassStats = await calculatePriceClassStats();
 
+  const mainStationStats = await calculateMainStationStats();
+
   // Get stations added this month
   const stationsThisMonth = await getStationsThisMonth();
 
   // If stats exist, update with calculated values
   if (stats) {
     stats.priceClassStats = priceClassStats;
+    stats.mainStationStats = mainStationStats;
     stats.stationsThisMonth = stationsThisMonth;
 
     // Update stats in the database
@@ -114,6 +117,7 @@ export async function getCollectionStats(): Promise<CollectionStats> {
     firstLaunch: false,
     priceClassStats,
     stationsThisMonth,
+    mainStationStats,
   };
 }
 
@@ -130,6 +134,33 @@ export async function isStationInCollection(
 export async function getSortedCollection(): Promise<CollectionEntry[]> {
   const collection = await getCollection();
   return collection.sort((a, b) => b.timestamp - a.timestamp);
+}
+
+// Calculate main station statistics
+export async function calculateMainStationStats(): Promise<{
+  collected: number;
+  total: number;
+}> {
+  const db = await getDB();
+
+  // Get all stations
+  const allStations = await db.getAll("stations");
+
+  // Get user's collection
+  const collection = await getCollection();
+
+  console.log("collection", collection);
+
+  // Calculate main station statistics
+  const mainStationStats: {
+    collected: number;
+    total: number;
+  } = {
+    collected: collection.filter((entry) => entry.station.isMainStation).length,
+    total: allStations.filter((station) => station.isMainStation).length,
+  };
+
+  return mainStationStats;
 }
 
 // Calculate price class statistics

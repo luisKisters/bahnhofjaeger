@@ -2,6 +2,7 @@
 
 import React from "react";
 import { CollectionStats } from "@/app/lib/db";
+import StatisticBar from "@/app/components/StatisticBar";
 
 interface StatsCardProps {
   stats: CollectionStats;
@@ -39,35 +40,39 @@ export default function StatsCard({
       .filter((pc) => stats.priceClassStats[pc]?.total > 0)
       .sort((a, b) => a - b);
 
+    const mainStationStats = stats.mainStationStats;
+
     return (
       <div className="mt-4">
         <h3 className="text-sm font-semibold text-gray-800 mb-2">
-          Price Class Completion
+          Completion Statistics
         </h3>
-
+        <StatisticBar
+          percentage={
+            Math.round(
+              (mainStationStats.collected / mainStationStats.total) * 1000
+            ) / 10
+          }
+          collected={mainStationStats.collected}
+          total={mainStationStats.total}
+          name="Main Stations"
+        />
         {priceClasses.map((pc) => {
           const { collected, total } = stats.priceClassStats[pc] || {
             collected: 0,
             total: 0,
           };
           const percentage =
-            total > 0 ? Math.round((collected / total) * 100) : 0;
+            total > 0 ? Math.round((collected / total) * 1000) / 10 : 0;
 
           return (
-            <div key={pc} className="mb-2">
-              <div className="flex justify-between text-xs font-medium mb-1">
-                <span className="text-gray-800">Class {pc}</span>
-                <span className="text-gray-800">
-                  {percentage}% ({collected}/{total})
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div
-                  className="bg-blue-600 h-2.5 rounded-full"
-                  style={{ width: `${percentage}%` }}
-                ></div>
-              </div>
-            </div>
+            <StatisticBar
+              percentage={percentage}
+              collected={collected}
+              total={total}
+              name={`Class ${pc}`}
+              key={pc}
+            />
           );
         })}
       </div>

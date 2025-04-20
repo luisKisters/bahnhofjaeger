@@ -48,6 +48,7 @@ export interface Station {
   hasParking?: boolean; // Has parking facilities
   hasWifi?: boolean; // Has WiFi
   hasDBLounge?: boolean; // Has DB Lounge
+  isMainStation?: boolean; // Whether this is a main station (Hbf)
 }
 
 // User's collection entry
@@ -66,6 +67,7 @@ export interface CollectionStats {
   firstLaunch: boolean;
   priceClassStats: { [key: number]: { collected: number; total: number } };
   stationsThisMonth: number;
+  mainStationStats: { collected: number; total: number };
 }
 
 const DB_NAME = "bahnhofjaeger-db";
@@ -132,12 +134,21 @@ export async function initializeStats(): Promise<CollectionStats> {
       firstLaunch: true,
       priceClassStats: {},
       stationsThisMonth: 0,
+      mainStationStats: { collected: 0, total: 0 },
     };
     await store.put(stats);
-  } else if (!stats.priceClassStats || !("stationsThisMonth" in stats)) {
+  } else if (
+    !stats.priceClassStats ||
+    !stats.mainStationStats ||
+    !("stationsThisMonth" in stats)
+  ) {
     // Add new fields to existing stats object if they don't exist
     stats.priceClassStats = stats.priceClassStats || {};
     stats.stationsThisMonth = stats.stationsThisMonth || 0;
+    stats.mainStationStats = stats.mainStationStats || {
+      collected: 0,
+      total: 0,
+    };
     await store.put(stats);
   }
 

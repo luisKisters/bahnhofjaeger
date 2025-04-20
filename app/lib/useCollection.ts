@@ -26,6 +26,7 @@ export function useCollection() {
       firstLaunch: false,
       priceClassStats: {},
       stationsThisMonth: 0,
+      mainStationStats: { collected: 0, total: 0 },
     },
     error: null,
   });

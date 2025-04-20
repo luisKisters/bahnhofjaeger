@@ -2,10 +2,19 @@ import Papa from "papaparse";
 import { Station, getDB } from "./db";
 
 // Calculate point value based on price class
-function calculatePoints(priceClass: number): number {
-  // Higher price class = lower points (PK1 is highest value)
-  // Simply invert the scale and multiply by 10 for more meaningful points
-  return (8 - priceClass) * 10;
+function calculatePoints(
+  priceClass: number,
+  isMainStation: boolean = false
+): number {
+  let basePoints = 0;
+  // Base points: Higher price class = lower points (PK1 is highest value)
+  if (isMainStation) {
+    basePoints = 100;
+  } else {
+    basePoints = (8 - priceClass) * 10;
+  }
+
+  return basePoints;
 }
 
 // Parse CSV row to Station object from enriched data
@@ -36,6 +45,7 @@ function parseStationRow(row: any): Station | null {
     const hasParking = row.HasParking === "true";
     const hasWifi = row.HasWiFi === "true";
     const hasDBLounge = row.HasDBLounge === "true";
+    const isMainStation = row.isMainStation === "true";
 
     // Skip invalid rows
     if (!uuid) {
@@ -68,7 +78,7 @@ function parseStationRow(row: any): Station | null {
       name: name.trim(),
       priceClass,
       state: state?.trim() || "Unknown",
-      pointValue: calculatePoints(priceClass),
+      pointValue: calculatePoints(priceClass, isMainStation),
       priceSmall,
       priceLarge,
       latitude: isNaN(latitude) ? undefined : latitude,
@@ -84,6 +94,7 @@ function parseStationRow(row: any): Station | null {
       hasParking,
       hasWifi,
       hasDBLounge,
+      isMainStation,
     };
   } catch (error) {
     console.error("Error parsing row:", error, row);
@@ -135,6 +146,7 @@ export async function importStationsFromCSV(csvData: string): Promise<number> {
 
           // Store stations in IndexedDB
           await storeStations(stations);
+          console.log("Sample station", stations[0]);
           resolve(stations.length);
         } catch (error: unknown) {
           console.error("Error during CSV processing:", error);
