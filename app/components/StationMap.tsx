@@ -7,7 +7,7 @@ import { CollectionEntry, Station } from "@/app/lib/db";
 import { getAllStations } from "@/app/lib/stations";
 
 // Initialize MapTiler with your API key
-maptilersdk.config.apiKey = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || "";
+maptilersdk.config.apiKey = process.env.MAPTILER_API_KEY || "";
 
 interface StationMapProps {
   entries: CollectionEntry[];
