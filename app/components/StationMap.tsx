@@ -9,6 +9,10 @@ import { getAllStations } from "@/app/lib/stations";
 // Initialize MapTiler with your API key
 maptilersdk.config.apiKey = process.env.MAPTILER_API_KEY || "";
 
+if (!maptilersdk.config.apiKey) {
+  throw new Error("MAPTILER_API_KEY is not set");
+}
+
 interface StationMapProps {
   entries: CollectionEntry[];
   onCollectionUpdated?: () => void;
