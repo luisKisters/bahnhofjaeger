@@ -7,10 +7,12 @@ import { CollectionEntry, Station } from "@/app/lib/db";
 import { getAllStations } from "@/app/lib/stations";
 
 // Initialize MapTiler with your API key
-maptilersdk.config.apiKey = process.env.MAPTILER_API_KEY || "";
-
-if (!maptilersdk.config.apiKey) {
-  throw new Error("MAPTILER_API_KEY is not set");
+if (!process.env.NEXT_PUBLIC_MAPTILER_API_KEY) {
+  console.error(
+    "NEXT_PUBLIC_MAPTILER_API_KEY is not set - maps will not work!"
+  );
+} else {
+  maptilersdk.config.apiKey = process.env.NEXT_PUBLIC_MAPTILER_API_KEY;
 }
 
 interface StationMapProps {
