@@ -1,6 +1,6 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+### Figma Design (Idea/Concept)
+[<img width="705" alt="image" src="https://github.com/user-attachments/assets/762ec42a-3bb7-40d9-b494-96536ab94857" />](https://www.figma.com/design/rDHRClMSgBkXwfgKsolAyg/Bahnhofj%C3%A4ger-Design?node-id=0-1&t=2p8LjBYemHPxeAjj-1)
 
-## Getting Started
 
 ### Environment Setup
 
