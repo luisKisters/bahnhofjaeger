@@ -45,3 +45,5 @@ data/pdfenv/*
 
 .gradle
 app/build
+manifest-checksum.txt
+android.keystore
