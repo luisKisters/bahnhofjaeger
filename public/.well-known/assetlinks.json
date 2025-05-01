@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.bahnhofjaeger.twa",
+      "sha256_cert_fingerprints": [
+        "6C:61:E3:EE:7B:DA:94:98:16:26:B3:3C:F9:73:83:C8:52:22:1A:4D:F6:39:20:BF:B6:08:A1:CD:35:1C:74:EB"
+      ]
+    }
+  }
+]
