@@ -127,7 +127,7 @@ export default function HomePage() {
           </div>
 
           {/* App Info */}
-          <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="bg-white rounded-lg shadow-md p-4 mb-2">
             <h2 className="text-lg font-semibold text-gray-800 mb-2">
               About Bahnhofjaeger
             </h2>
@@ -138,6 +138,11 @@ export default function HomePage() {
             <p className="text-sm text-gray-500">
               This app works offline - perfect for your train journeys.
             </p>
+          </div>
+          <div className="text-xs text-gray-400 text-center mt-2">
+            <Link href="/privacy" className="underline hover:text-blue-600">
+              Privacy Policy
+            </Link>
           </div>
         </div>
       </Layout>
