@@ -1,8 +1,9 @@
 import React from "react";
+import Link from "next/link";
 
 export default function PrivacyPage() {
   return (
-    <div className="max-w-md mx-auto p-4 text-gray-800">
+    <div className="max-w-md mx-auto p-4 text-white">
       <h1 className="text-2xl font-bold mb-4">Datenschutzerklärung</h1>
       <p className="mb-2 text-sm text-gray-500">
         Letzte Aktualisierung: 1. Mai 2025
@@ -68,6 +69,11 @@ export default function PrivacyPage() {
         Bei Fragen zum Datenschutz kontaktiere uns über die Projektseite oder
         den App Store Eintrag.
       </p>
+      <div className="text-xs text-gray-400 text-center mt-2">
+        <Link href="/privacy" className="underline hover:text-blue-600">
+          Privacy Policy
+        </Link>
+      </div>
     </div>
   );
 }
