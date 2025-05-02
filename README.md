@@ -1,91 +1,75 @@
-### Figma Design (Idea/Concept)
-[<img width="705" alt="image" src="https://github.com/user-attachments/assets/762ec42a-3bb7-40d9-b494-96536ab94857" />](https://www.figma.com/design/rDHRClMSgBkXwfgKsolAyg/Bahnhofj%C3%A4ger-Design?node-id=0-1&t=2p8LjBYemHPxeAjj-1)
+[![Deployed on Vercel](https://deploy-badge.vercel.app/vercel/bahnhofjaeger)](https://bahnhofjaeger.vercel.app)
 
+# Bahnhofjäger
 
-### Environment Setup
+**Collect every train station in Germany!** Bahnhofjäger is a mobile-first, offline-capable Progressive Web App (PWA) for discovering, tracking, and collecting Deutsche Bahn stations. Earn points, view stats, and explore the map—no internet required.
 
-1. Create a `.env.local` file in the root directory of the project and add your MapTiler API key:
+---
+
+## 🚦 Play Store Early Access
+
+Bahnhofjäger is currently in **closed testing** on the Google Play Store. If you want early access, please [email me](mailto:luis.w.kisters@gmail.com) with your request!
+
+---
+
+## ✨ Features
+
+- **Offline-first:** All data and collection progress is stored locally for full offline use
+- **Mobile-optimized:** Touch-friendly, responsive UI for phones
+- **Station collection:** Search, collect, and track every DB station
+- **Fuzzy search:** Quickly find stations by name
+- **Interactive map:** See your collection and all stations visually
+- **Points & stats:** Earn points, track progress, and view collection statistics
+- **Privacy-first:** No account required, no data leaves your device
+
+---
+
+## 🚀 Quickstart
+
+1. **Clone the repo and install dependencies:**
 
 ```bash
-# Get your API key from https://cloud.maptiler.com/
+pnpm install
+```
+
+2. **Set up your MapTiler API key:**
+
+Create a `.env.local` file in the root directory:
+
+```bash
 NEXT_PUBLIC_MAPTILER_API_KEY=your_api_key_here
 ```
 
-2. Then, run the development server:
+3. **Run the development server:**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📚 Project Resources
 
-## Map Features
+- **Data sources, conversion utilities, and enrichment scripts:** See [`resources.md`](./resources.md)
+- **Current and planned features, technical tasks, and priorities:** See [`TODO.md`](./TODO.md)
 
-The application uses MapTiler SDK for displaying station maps. The map shows:
+---
 
-- Blue markers for stations in your collection
-- Gray markers for stations not yet collected
-- Marker size based on station price class (higher classes = larger markers)
+## 🗺️ Data Enrichment
 
-## Station Data Enrichment
+Bahnhofjäger includes scripts to enrich Deutsche Bahn station data with additional information (coordinates, address, facilities, etc.) using the StaDa API. See `resources.md` for details and instructions.
 
-This project includes a script to enrich Deutsche Bahn station data with additional information from the StaDa API.
+---
 
-### Prerequisites
+## 📖 Learn More
 
-1. Create a Deutsche Bahn API Marketplace account at https://developers.deutschebahn.com/
-2. Subscribe to the StaDa API (Free4All plan)
-3. Create a `.env` file with your API credentials:
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Vercel Deployment](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)
 
-```
-DB_CLIENT_ID=your_db_client_id_here
-DB_SECRET=your_db_secret_here
-```
+---
 
-### Running the Enrichment
+## 📝 License
 
-To test with a sample of 10 stations first:
-
-```bash
-pnpm enrich-stations-sample
-```
-
-To process the full dataset:
-
-```bash
-pnpm enrich-stations
-```
-
-The script will generate an enriched CSV file with additional data:
-
-- Geographic coordinates (longitude, latitude)
-- Address information
-- Aufgabentraeger details
-- Station type (ProductLine)
-- Facility information (parking, WiFi)
-- Unique IDs for each station
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is for personal and educational use. For licensing or other questions, [contact me](mailto:luis.w.kisters@gmail.com).
