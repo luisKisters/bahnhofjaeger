@@ -68,6 +68,7 @@ export interface CollectionStats {
   priceClassStats: { [key: number]: { collected: number; total: number } };
   stationsThisMonth: number;
   mainStationStats: { collected: number; total: number };
+  level: string;
 }
 
 const DB_NAME = "bahnhofjaeger-db";
@@ -135,6 +136,7 @@ export async function initializeStats(): Promise<CollectionStats> {
       priceClassStats: {},
       stationsThisMonth: 0,
       mainStationStats: { collected: 0, total: 0 },
+      level: "Eisen I",
     };
     await store.put(stats);
   } else if (
