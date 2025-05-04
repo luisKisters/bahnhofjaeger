@@ -4,18 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build && cp -r .next release/",
     "start": "next start",
     "lint": "next lint",
+    "build-twa": "bubblewrap build && mv app-release-bundle.aab release/ && mv app-release-signed.apk release/ && mv app-release-signed.apk.idsig release/ && mv app-release-unsigned-aligned.apk release/",
     "enrich-stations": "node scripts/enrich-stations.js",
     "enrich-stations-sample": "node scripts/enrich-stations-sample.js"
   },
   "dependencies": {
     "@maptiler/sdk": "^3.1.1",
     "@types/mapbox-gl": "^3.4.1",
-    "@types/papaparse": "^5.3.15",
     "@types/uuid": "^10.0.0",
-    "axios": "^1.6.7",
     "csv-parser": "^3.0.0",
     "csv-writer": "^1.6.0",
     "dotenv": "^16.4.5",
@@ -23,7 +22,6 @@
     "leaflet": "^1.9.4",
     "mapbox-gl": "^3.11.0",
     "next": "15.3.0",
-    "papaparse": "^5.5.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-leaflet": "^5.0.0",
@@ -31,6 +29,9 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "papaparse": "^5.5.2",
+    "axios": "^1.6.7",
+    "@types/papaparse": "^5.3.15",
     "@eslint/eslintrc": "^3",
     "@serwist/build": "^9.0.13",
     "@serwist/next": "^9.0.13",

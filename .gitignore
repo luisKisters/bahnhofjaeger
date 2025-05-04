@@ -47,3 +47,4 @@ data/pdfenv/*
 app/build
 manifest-checksum.txt
 android.keystore
+release
