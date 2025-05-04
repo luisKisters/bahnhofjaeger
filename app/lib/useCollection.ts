@@ -27,6 +27,7 @@ export function useCollection() {
       priceClassStats: {},
       stationsThisMonth: 0,
       mainStationStats: { collected: 0, total: 0 },
+      level: "Eisen I",
     },
     error: null,
   });

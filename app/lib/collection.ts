@@ -94,11 +94,14 @@ export async function getCollectionStats(): Promise<CollectionStats> {
   // Get stations added this month
   const stationsThisMonth = await getStationsThisMonth();
 
+  const levelStats = await calculateLevelStats();
+
   // If stats exist, update with calculated values
   if (stats) {
     stats.priceClassStats = priceClassStats;
     stats.mainStationStats = mainStationStats;
     stats.stationsThisMonth = stationsThisMonth;
+    stats.level = levelStats;
 
     // Update stats in the database
     const tx = db.transaction("stats", "readwrite");
@@ -118,6 +121,7 @@ export async function getCollectionStats(): Promise<CollectionStats> {
     priceClassStats,
     stationsThisMonth,
     mainStationStats,
+    level: "Eisen I",
   };
 }
 
@@ -161,6 +165,42 @@ export async function calculateMainStationStats(): Promise<{
   };
 
   return mainStationStats;
+}
+
+// Calculate level
+export async function calculateLevelStats() {
+  const db = await getDB();
+  const stats = (await db.get("stats", "collection-stats")) as CollectionStats;
+  const totalPoints = stats.totalPoints;
+
+  if (totalPoints) {
+    let rank = "";
+    if (totalPoints < 250) rank = "Eisen I";
+    else if (totalPoints < 500) rank = "Eisen II";
+    else if (totalPoints < 750) rank = "Eisen III";
+    else if (totalPoints < 1000) rank = "Bronze I";
+    else if (totalPoints < 1250) rank = "Bronze II";
+    else if (totalPoints < 1500) rank = "Bronze III";
+    else if (totalPoints < 2000) rank = "Silber I";
+    else if (totalPoints < 2500) rank = "Silber II";
+    else if (totalPoints < 3000) rank = "Silber III";
+    else if (totalPoints < 4000) rank = "Gold I";
+    else if (totalPoints < 5000) rank = "Gold II";
+    else if (totalPoints < 6000) rank = "Gold III";
+    else if (totalPoints < 8000) rank = "Platin I";
+    else if (totalPoints < 10000) rank = "Platin II";
+    else if (totalPoints < 12000) rank = "Platin III";
+    else if (totalPoints < 16000) rank = "Diamant I";
+    else if (totalPoints < 20000) rank = "Diamant II";
+    else if (totalPoints < 25000) rank = "Diamant III";
+    else if (totalPoints < 35000) rank = "Meister I";
+    else if (totalPoints < 50000) rank = "Meister II";
+    else rank = "Meister III";
+
+    return rank;
+  } else {
+    throw new Error("Stats not availible");
+  }
 }
 
 // Calculate price class statistics
