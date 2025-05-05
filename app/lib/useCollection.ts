@@ -20,7 +20,6 @@ export function useCollection() {
     entries: [],
     stats: {
       key: "collection-stats",
-      totalPoints: 0,
       totalStations: 0,
       lastUpdated: 0,
       firstLaunch: false,
@@ -28,6 +27,8 @@ export function useCollection() {
       stationsThisMonth: 0,
       mainStationStats: { collected: 0, total: 0 },
       level: "Eisen I",
+      totalPoints: 0,
+      monthStreak: 0,
     },
     error: null,
   });

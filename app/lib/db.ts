@@ -67,6 +67,7 @@ export interface CollectionStats {
   firstLaunch: boolean;
   priceClassStats: { [key: number]: { collected: number; total: number } };
   stationsThisMonth: number;
+  monthStreak: number;
   mainStationStats: { collected: number; total: number };
   level: string;
 }
@@ -137,6 +138,7 @@ export async function initializeStats(): Promise<CollectionStats> {
       stationsThisMonth: 0,
       mainStationStats: { collected: 0, total: 0 },
       level: "Eisen I",
+      monthStreak: 0,
     };
     await store.put(stats);
   } else if (
