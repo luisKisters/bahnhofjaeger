@@ -80,3 +80,8 @@
 - [ ] change to bahn.de-like styling
 - [ ] fix "add to collection" button not working in map
 - [ ] change trainstation identifcation from name to id
+- [ ] achievments (a la "D-Ticket Warrior" bei vielen Preisklasse 4-7)
+- [ ] make bestenlist depedant on totalPoints w/ threshold (min/max) and possibly activation function? (e.g simoid) to determine height
+  - schnelles nicht echtes beispiel
+    - 20p = 10px = 0.1% = 0.1%
+    - 20000p = 100px = 0.2 = 20%
