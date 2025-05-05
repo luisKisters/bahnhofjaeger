@@ -50,6 +50,7 @@ export function useCollection() {
         error: null,
       });
     } catch (error) {
+      console.error("Error in useCollection:", error);
       setState((prev) => ({
         ...prev,
         isLoading: false,
