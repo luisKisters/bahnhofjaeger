@@ -4,17 +4,9 @@ import React from "react";
 import { CollectionStats } from "@/app/lib/db";
 import StatisticBar from "@/app/components/StatisticBar";
 
-interface StatsCardProps {
-  stats: CollectionStats;
-  showPriceClassCompletion?: boolean;
-  className?: string;
-}
+export default function StatsCard(props: { stats: CollectionStats }) {
+  const { stats } = props;
 
-export default function StatsCard({
-  stats,
-  showPriceClassCompletion = true,
-  className = "",
-}: StatsCardProps) {
   // Format the last updated date
   const formatDate = (timestamp: number) => {
     if (!timestamp) return "Never";
@@ -80,55 +72,75 @@ export default function StatsCard({
   };
 
   return (
-    <div className={`bg-white rounded-lg shadow-md p-4 ${className}`}>
-      <h2 className="text-lg font-semibold text-gray-800 mb-3">
-        Collection Stats
-      </h2>
+    <div className="">
+      <h2 className="text-xl mb-2 ">Punkte und Level</h2>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-blue-50 p-3 rounded-lg">
-          <div className="text-sm font-medium text-blue-800">Total Points</div>
-          <div className="text-2xl font-bold text-blue-900">
-            {stats.totalPoints}
+        <div className="flex flex-col justify-center item-center text-center bg-background-secondary p-4 rounded-lg">
+          <div className="text-3xl font-bold text-shadow-lg">
+            {/* {stats.totalPoints} */} 1.250
           </div>
+          <div className="font-medium text-sm text-shadow-lg">Sammelpunkte</div>
         </div>
 
-        <div className="bg-green-50 p-3 rounded-lg">
-          <div className="text-sm font-medium text-green-800">Stations</div>
-          <div className="text-2xl font-bold text-green-900">
+        <div className="flex flex-col justify-center item-center text-center bg-background-secondary p-4 rounded-lg">
+          <div className="text-3xl font-bold text-shadow-lg">
             {stats.totalStations}
           </div>
+          <div className="text-sm font-medium text-shadow-lg">Stations</div>
         </div>
 
-        <div className="bg-purple-50 p-3 rounded-lg">
-          <div className="text-sm font-medium text-purple-800">
-            {getCurrentMonthName()} Stations
-          </div>
-          <div className="text-2xl font-bold text-purple-900">
+        <div className="flex flex-col justify-center item-center text-center bg-background-secondary p-4 rounded-lg">
+          <div className="text-3xl font-bold text-shadow-lg">
             {stats.stationsThisMonth}
           </div>
+          <div className="text-sm font-medium text-shadow-lg">
+            {getCurrentMonthName()} Stations
+          </div>
         </div>
 
-        <div className="bg-yellow-50 p-3 rounded-lg">
-          <div className="text-sm font-medium text-yellow-800">
-            Overall Completion
-          </div>
-          <div className="text-2xl font-bold text-yellow-900">
-            {Math.round(
-              (stats.totalStations /
-                (Object.values(stats.priceClassStats).reduce(
-                  (sum, { total }) => sum + total,
-                  0
-                ) || 1)) *
-                100
-            )}
-            %
+        <div className="flex flex-col justify-center item-center text-center bg-background-secondary p-4 rounded-lg relative overflow-hidden">
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(90deg, var(--color-action) 0%, var(--color-action) ${Math.round(
+                (stats.totalStations /
+                  (Object.values(stats.priceClassStats).reduce(
+                    (sum, { total }) => sum + total,
+                    0
+                  ) || 1)) *
+                  100
+              )}%, transparent ${Math.round(
+                (stats.totalStations /
+                  (Object.values(stats.priceClassStats).reduce(
+                    (sum, { total }) => sum + total,
+                    0
+                  ) || 1)) *
+                  100
+              )}%)`,
+            }}
+          />
+          <div className="relative">
+            <div className="text-3xl font-bold text-shadow-lg">
+              {Math.round(
+                (stats.totalStations /
+                  (Object.values(stats.priceClassStats).reduce(
+                    (sum, { total }) => sum + total,
+                    0
+                  ) || 1)) *
+                  100
+              )}
+              %
+            </div>
+            <div className="font-medium text-sm text-shadow-lg">
+              Overall Completion
+            </div>
           </div>
         </div>
       </div>
 
       {/* Price Class Statistics */}
-      {showPriceClassCompletion && renderPriceClassProgress()}
+      {/* {showPriceClassCompletion && renderPriceClassProgress()} */}
 
       <div className="mt-3 text-xs font-medium text-gray-600 text-right">
         Last updated: {formatDate(stats.lastUpdated)}

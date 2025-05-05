@@ -1,20 +1,17 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { Search, X } from "lucide-react";
 
 interface SearchInputProps {
-  onSearch: (query: string) => void;
-  initialValue?: string;
-  placeholder?: string;
+  search: boolean;
 }
 
-export default function SearchInput({
-  onSearch,
-  initialValue = "",
-  placeholder = "Search for a station...",
-}: SearchInputProps) {
-  const [query, setQuery] = useState(initialValue);
+export default function SearchInput({}: SearchInputProps) {
+  const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isFocused, setIsFocused] = useState(false);
+  const [onSearch, setOnSearch] = useState("");
 
   // Focus input on mount
   useEffect(() => {
@@ -26,70 +23,57 @@ export default function SearchInput({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
-    onSearch(value);
+    setOnSearch("");
   };
 
   const handleClear = () => {
     setQuery("");
-    onSearch("");
+    setOnSearch("");
     if (inputRef.current) {
       inputRef.current.focus();
     }
   };
 
   return (
-    <div className="relative w-full">
-      <div className="relative flex items-center">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <svg
-            className="w-4 h-4 text-gray-500"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+    <div className="gap-y-2 relative">
+      <div className="relative m-3">
+        <div className="relative flex items-center">
+          <div className="absolute inset-y-0 left-0 flex items-center justify-center pl-3 pointer-events-none">
+            <Search
+              className={
+                query ? "w-5 h-5 text-white" : "w-5 h-5 text-secondary"
+              }
             />
-          </svg>
-        </div>
+          </div>
 
-        <input
-          ref={inputRef}
-          type="text"
-          className="block w-full p-3 pl-10 pr-10 text-lg bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          placeholder={placeholder}
-          value={query}
-          onChange={handleChange}
-          autoComplete="off"
-        />
+          <input
+            ref={inputRef}
+            type="text"
+            className="block w-full p-3 pl-10 pr-10 text-lg bg-background-secondary outline-none shadow-sm rounded-[5px] focus:ring-2 focus:ring-action"
+            placeholder="Bahnhof eingeben..."
+            value={query}
+            onBlur={() => setIsFocused(false)}
+            onFocus={() => setIsFocused(true)}
+            onChange={handleChange}
+            autoComplete="off"
+          />
 
-        {query && (
-          <button
-            type="button"
-            className="absolute inset-y-0 right-0 flex items-center pr-3"
-            onClick={handleClear}
-          >
-            <svg
-              className="w-4 h-4 text-gray-500 hover:text-gray-700"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          {query && (
+            <button
+              type="button"
+              className="absolute inset-y-0 right-0 flex items-center pr-3"
+              onClick={handleClear}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        )}
+              <X className="w-4 h-4 text-secondary hover:text-white" />
+            </button>
+          )}
+        </div>
       </div>
+      {query && (
+        <div className="absolut m-3">
+          <p>hello</p>
+        </div>
+      )}
     </div>
   );
 }
