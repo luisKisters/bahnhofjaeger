@@ -92,15 +92,11 @@ export async function getCollectionStats(): Promise<CollectionStats> {
   const db = await getDB();
   const stats = (await db.get("stats", "collection-stats")) as CollectionStats;
 
-  // Calculate price class statistics
   const priceClassStats = await calculatePriceClassStats();
-
   const mainStationStats = await calculateMainStationStats();
-
-  // Get stations added this month
   const stationsThisMonth = await getStationsThisMonth();
-
   const levelStats = await calculateLevelStats();
+  const monthStreakStats = await calculateMonthStreak();
 
   // If stats exist, update with calculated values
   if (stats) {
@@ -108,6 +104,7 @@ export async function getCollectionStats(): Promise<CollectionStats> {
     stats.mainStationStats = mainStationStats;
     stats.stationsThisMonth = stationsThisMonth;
     stats.level = levelStats;
+    stats.monthStreak = monthStreakStats;
 
     // Update stats in the database
     const tx = db.transaction("stats", "readwrite");
@@ -128,6 +125,7 @@ export async function getCollectionStats(): Promise<CollectionStats> {
     stationsThisMonth,
     mainStationStats,
     level: "Eisen I",
+    monthStreak: 0,
   };
 }
 
@@ -186,6 +184,7 @@ export async function calculateLevelStats() {
   }
 
   const totalPoints = stats.totalPoints;
+  console.log("check", typeof totalPoints === "number");
 
   // Now we can safely calculate the rank, including the case where totalPoints is 0
   let rank = "Eisen I";
@@ -277,4 +276,54 @@ export async function getStationsThisMonth(): Promise<number> {
   ).length;
 
   return stationsThisMonth;
+}
+
+function getMonthsBetween(startDate: Date, endDate: Date): string[] {
+  const months: string[] = [];
+  const current = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+
+  while (current <= endDate) {
+    months.push(
+      `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}`
+    );
+    current.setMonth(current.getMonth() + 1);
+  }
+
+  return months;
+}
+
+export async function calculateMonthStreak() {
+  const collection = await getSortedCollection();
+
+  if (!collection || collection.length === 0) {
+    return 0;
+  }
+
+  const startDate = new Date(collection[collection.length - 1].timestamp);
+  const endDate = new Date(collection[0].timestamp);
+
+  const currentMonth = new Date().toISOString().slice(0, 7);
+
+  if (!JSON.stringify(new Date(endDate)).includes(currentMonth)) {
+    return 0;
+  }
+
+  const range = getMonthsBetween(startDate, endDate);
+
+  const monthsWithEntries = collection
+    .map((entry) => new Date(entry.timestamp).toISOString().slice(0, 7))
+    .filter((item, index, array) => array.indexOf(item) === index);
+
+  let streak = 0;
+
+  console.log("starting.");
+  for (const month of range.reverse()) {
+    if (monthsWithEntries.includes(month)) {
+      streak++;
+    } else break;
+  }
+  return streak;
 }
