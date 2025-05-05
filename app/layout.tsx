@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "./components/ServiceWorkerRegistration";
+import SearchInput from "@/app/components/SearchInput";
+import { Navigation } from "@/app/components/Navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -79,7 +81,13 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ServiceWorkerRegistration />
-        {children}
+        <div className="flex flex-col min-h-screen bg-background">
+          {/* Main content */}
+          <SearchInput search={true} />
+          <main className="flex-1 p-4 pb-20">{children}</main>
+
+          <Navigation />
+        </div>
       </body>
     </html>
   );
