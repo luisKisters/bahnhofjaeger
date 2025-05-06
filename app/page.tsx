@@ -11,7 +11,7 @@ export default function HomePage() {
 
   return (
     <InitializationScreen>
-      <div className="">
+      <div className="pt-20 p-4 pb-20">
         <h1 className="text-3xl font-bold">Bahnhofjäger</h1>
         <p className="text-lg text-secondary mb-8 font-light">
           Sammle Bahnhöfe und erhalte Punkte!

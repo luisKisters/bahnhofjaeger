@@ -82,10 +82,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <ServiceWorkerRegistration />
         <div className="flex flex-col min-h-screen bg-background">
-          {/* Main content */}
-          <SearchInput search={true} />
-          <main className="flex-1 p-4 pb-20">{children}</main>
-
+          <div className="absolute top-0 left-0 w-full z-10">
+            <SearchInput search={true} />
+          </div>
+          <main className="flex-1 z-0 w-full h-full">{children}</main>
           <Navigation />
         </div>
       </body>
