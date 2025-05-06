@@ -37,7 +37,7 @@ export const Navigation = () => {
           <span>Home</span>
         </NavLink>
 
-        <NavLink href="/search" active={pathname === "/search"}>
+        <NavLink href="/map" active={pathname === "/search"}>
           <Map className="h-6 w-6" />
           <span>Karte</span>
         </NavLink>

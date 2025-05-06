@@ -281,21 +281,23 @@ export default function StationMap({
         // Initialize map
         map.current = new maptilersdk.Map({
           container: mapContainer.current,
-          style: maptilersdk.MapStyle.STREETS,
+          style: maptilersdk.MapStyle.STREETS.DARK,
           center: defaultCenter,
           zoom: 5,
           maxZoom: 18,
           minZoom: 3,
           attributionControl: false,
+          navigationControl: false,
+          geolocateControl: false,
         });
 
-        // Add navigation and attribution controls
-        map.current.addControl(new maptilersdk.NavigationControl());
-        map.current.addControl(
-          new maptilersdk.AttributionControl({
-            compact: true,
-          })
-        );
+        // // Add navigation and attribution controls
+        // map.current.addControl(new maptilersdk.NavigationControl());
+        // map.current.addControl(
+        //   new maptilersdk.AttributionControl({
+        //     compact: true,
+        //   })
+        // );
 
         map.current.on("load", () => {
           console.log("Map loaded successfully");
@@ -559,7 +561,7 @@ export default function StationMap({
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-4 mb-4 text-center">
+      <div className="bg-white text-center">
         <p className="text-gray-600">Loading stations map...</p>
       </div>
     );
@@ -567,7 +569,7 @@ export default function StationMap({
 
   if (allStations.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-4 mb-4 text-center">
+      <div className="bg-white text-center">
         <p className="text-gray-600">
           No stations with map coordinates available
         </p>
@@ -576,10 +578,24 @@ export default function StationMap({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-4">
-      <h2 className="text-lg font-medium text-gray-800 mb-3">Station Map</h2>
-      <div className="mb-2 text-sm flex items-center justify-between">
-        <div>
+    <div className="bg-white w-full h-full flex flex-col">
+      {/* Map container - subtract height of controls */}
+      <div className="flex-1 relative min-h-0">
+        <div
+          ref={mapContainer}
+          id="map-container"
+          className="absolute inset-0"
+          style={{
+            position: "relative",
+            width: "100%",
+            height: "100%",
+            overflow: "hidden",
+          }}
+        />
+      </div>
+      {/* Controls container */}
+      <div className="flex-none">
+        <div className="p-2 border-t">
           <span className="inline-block mr-4">
             <span className="inline-block w-3 h-3 rounded-full bg-[#0066ff] mr-1"></span>{" "}
             Collected
@@ -592,7 +608,7 @@ export default function StationMap({
             Larger markers = higher price class (lower number)
           </span>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center p-2">
           <input
             type="checkbox"
             id="show-uncollected"
@@ -608,17 +624,6 @@ export default function StationMap({
           </label>
         </div>
       </div>
-      <div
-        ref={mapContainer}
-        id="map-container"
-        className="relative w-full h-[400px] overflow-hidden"
-        style={{
-          position: "relative",
-          width: "100%",
-          height: "400px",
-          overflow: "hidden",
-        }}
-      />
     </div>
   );
 }
