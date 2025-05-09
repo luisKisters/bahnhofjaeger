@@ -13,7 +13,8 @@ export default function MapPage() {
   };
 
   return (
-    <div className="w-full h-[calc(100vh-80px)]">
+    // 64px = navbar height
+    <div className="w-full h-[calc(100vh-64px)]">
       <StationMap
         entries={entries}
         onCollectionUpdated={handleCollectionUpdated}

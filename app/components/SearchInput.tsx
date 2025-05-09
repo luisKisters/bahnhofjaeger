@@ -35,8 +35,8 @@ export default function SearchInput({}: SearchInputProps) {
   };
 
   return (
-    <div className="gap-y-2 relative">
-      <div className="relative m-3">
+    <div className="absolute top-0 left-0 w-full z-30 gap-y-2">
+      <div className="p-3">
         <div className="relative flex items-center">
           <div className="absolute inset-y-0 left-0 flex items-center justify-center pl-3 pointer-events-none">
             <Search
@@ -49,7 +49,7 @@ export default function SearchInput({}: SearchInputProps) {
           <input
             ref={inputRef}
             type="text"
-            className="block w-full p-3 pl-10 pr-10 text-lg bg-background-secondary outline-none shadow-sm rounded-[5px] focus:ring-2 focus:ring-action"
+            className="block w-full p-3 pl-10 pr-10 text-lg bg-background-secondary outline-none shadow-sm rounded-lg focus:ring-2 focus:ring-action"
             placeholder="Bahnhof eingeben..."
             value={query}
             onBlur={() => setIsFocused(false)}

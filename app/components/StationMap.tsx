@@ -1,10 +1,22 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import * as maptilersdk from "@maptiler/sdk";
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 import { CollectionEntry, Station } from "@/app/lib/db";
 import { getAllStations } from "@/app/lib/stations";
+import { Button } from "@/app/components/ui/button";
+import { Settings, Loader2, WifiOff } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/app/components/ui/dialog";
+import { Switch } from "@/app/components/ui/switch";
+import { addStationToCollection as addStationToClientDb } from "@/app/lib/collection";
+import { BottomSheet } from "@/app/components/ui/BottomSheet";
 
 // Initialize MapTiler with your API key
 if (!process.env.NEXT_PUBLIC_MAPTILER_API_KEY) {
@@ -13,6 +25,32 @@ if (!process.env.NEXT_PUBLIC_MAPTILER_API_KEY) {
   );
 } else {
   maptilersdk.config.apiKey = process.env.NEXT_PUBLIC_MAPTILER_API_KEY;
+}
+
+// Type for Nominatim API response
+interface NominatimResponse {
+  place_id: number;
+  licence: string;
+  osm_type: string;
+  osm_id: number;
+  lat: string;
+  lon: string;
+  display_name: string;
+  address: {
+    railway?: string;
+    road?: string;
+    neighbourhood?: string;
+    suburb?: string;
+    city_district?: string;
+    city?: string;
+    county?: string;
+    state?: string;
+    postcode?: string;
+    country?: string;
+    country_code?: string;
+    [key: string]: string | undefined;
+  };
+  boundingbox: string[];
 }
 
 interface StationMapProps {
@@ -27,7 +65,7 @@ export default function StationMap({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [allStations, setAllStations] = useState<Station[]>([]);
+  const [allStationsData, setAllStationsData] = useState<Station[]>([]);
   const [loading, setLoading] = useState(true);
   const [mapInitialized, setMapInitialized] = useState(false);
   const markersRef = useRef<maptilersdk.Marker[]>([]);
@@ -35,77 +73,94 @@ export default function StationMap({
   const [addingToCollection, setAddingToCollection] = useState<string | null>(
     null
   );
+  const [selectedStation, setSelectedStation] = useState<Station | null>(null);
+  const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [locationDetails, setLocationDetails] =
+    useState<NominatimResponse | null>(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Create a Set of collected station IDs for quick lookups
-  const collectedStationIdsRef = useRef(
+  // State to hold the set of collected station IDs to trigger re-renders
+  const [collectedStationIds, setCollectedStationIds] = useState(
     new Set(entries.map((entry) => entry.stationId))
   );
 
-  // Update collected stations when entries change
+  // Check online status
   useEffect(() => {
-    collectedStationIdsRef.current = new Set(
-      entries.map((entry) => entry.stationId)
-    );
+    const handleOnlineStatus = () => {
+      setIsOnline(navigator.onLine);
+    };
+
+    // Set initial status
+    setIsOnline(navigator.onLine);
+
+    // Add event listeners
+    window.addEventListener("online", handleOnlineStatus);
+    window.addEventListener("offline", handleOnlineStatus);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("online", handleOnlineStatus);
+      window.removeEventListener("offline", handleOnlineStatus);
+    };
+  }, []);
+
+  useEffect(() => {
+    // When the entries prop changes (from useCollection), update our local state Set
+    setCollectedStationIds(new Set(entries.map((entry) => entry.stationId)));
   }, [entries]);
 
-  // Get valid entries from collection (those with coordinates)
+  const isStationCollected = useCallback(
+    (stationId: string): boolean => {
+      return collectedStationIds.has(stationId);
+    },
+    [collectedStationIds]
+  );
+
   const validCollectionEntries = entries.filter(
     (entry) => entry.station.latitude && entry.station.longitude
   );
 
-  // Default center to Germany if no stations or all invalid
-  const defaultCenter: [number, number] = [10.4515, 51.1657]; // Center of Germany [lng, lat]
+  const defaultCenter: [number, number] = [10.4515, 51.1657];
 
-  // Function to determine marker scale based on price class (with smaller values)
   const getMarkerScale = (priceClass: number, isCollected: boolean): number => {
-    // Invert scale so that priceClass 1 is largest
-    const invertedScale = 8 - priceClass; // This gives 7 for class 1, 6 for class 2, etc.
-
-    // Base scale from price class
+    const invertedScale = 8 - priceClass;
     const baseScale = 0.5 + invertedScale * 0.1;
-
-    // Apply collection status multiplier (slightly smaller for collected stations)
     return isCollected ? baseScale * 1.2 : baseScale * 0.85;
   };
 
-  // Function to create a custom HTML marker element
   const createCustomMarker = (
     station: Station,
-    isCollected: boolean
+    isCollected: boolean,
+    isSelected: boolean
   ): HTMLElement => {
-    // Set color based on collection status
-    const color = isCollected ? "#0066ff" : "#808080"; // Blue for collected, gray for uncollected
-
-    // Get scale based on price class (1-7) and collection status
+    const color = isCollected
+      ? "var(--color-action)"
+      : "var(--color-secondary-marker, #777777)";
     const scale = getMarkerScale(station.priceClass, isCollected);
-
-    // Base size - make markers overall smaller
     const baseSize = 12;
     const size = Math.round(baseSize * scale);
-
-    // Create the marker element
     const el = document.createElement("div");
-
-    // Create a wrapper with slightly larger clickable area (tiny invisible padding)
     const wrapper = document.createElement("div");
-    wrapper.style.width = `${size + 2}px`; // Just 1px extra on each side
+    wrapper.style.width = `${size + 2}px`;
     wrapper.style.height = `${size + 2}px`;
     wrapper.style.display = "flex";
     wrapper.style.justifyContent = "center";
     wrapper.style.alignItems = "center";
-    wrapper.style.cursor = "pointer"; // Change cursor on hover
-
-    // Style the marker
+    wrapper.style.cursor = "pointer";
     el.style.width = `${size}px`;
     el.style.height = `${size}px`;
     el.style.borderRadius = "50%";
     el.style.backgroundColor = color;
-    el.style.border = "1px solid white";
     el.style.boxShadow = "0 0 3px rgba(0,0,0,0.3)";
-
-    // For larger markers, add the price class as text
+    if (isSelected) {
+      el.style.border = "2px solid white";
+    } else {
+      el.style.border = "none";
+    }
     if (size >= 14) {
-      // Add price class as text in the center of the marker
       const textEl = document.createElement("div");
       textEl.textContent = station.priceClass.toString();
       textEl.style.color = "white";
@@ -115,173 +170,136 @@ export default function StationMap({
       textEl.style.fontSize = `${Math.max(8, size / 2)}px`;
       el.appendChild(textEl);
     }
-
-    // Set z-index for collected stations to be higher (on top)
     if (isCollected) {
       el.style.zIndex = "1000";
     }
-
     wrapper.appendChild(el);
     return wrapper;
   };
 
-  // Function to add a station to collection
-  const addStationToCollection = async (stationId: string) => {
+  const handleAddToClientCollection = async (
+    stationToCollect: Station
+  ): Promise<boolean> => {
+    if (!stationToCollect) return false;
+
+    // 1. Set loading state for the specific station being added
+    setAddingToCollection(stationToCollect.id);
+
     try {
-      const response = await fetch("/api/collection/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ stationId }),
-      });
+      // 2. Attempt to add to client-side IndexedDB
+      const success = await addStationToClientDb(stationToCollect);
 
-      if (!response.ok) {
-        throw new Error("Failed to add station to collection");
-      }
+      if (success) {
+        console.log("Successfully added to client DB");
 
-      // Add to local set to update UI immediately
-      collectedStationIdsRef.current.add(stationId);
-
-      // Notify parent if needed
-      if (onCollectionUpdated) {
-        onCollectionUpdated();
-      }
-
-      return true;
-    } catch (error) {
-      console.error("Error adding station to collection:", error);
-      throw error;
-    }
-  };
-
-  // Helper function to create popup content
-  const createPopupContent = (station: Station, isCollected: boolean) => {
-    const container = document.createElement("div");
-    container.className = "station-popup-content";
-    container.style.zIndex = "2000"; // Higher z-index to appear above markers
-
-    const html = `
-      <h3 class="font-medium">${station.name}</h3>
-      <p class="text-sm">Price Class: ${station.priceClass}</p>
-      <p class="text-sm">Points: ${station.pointValue}</p>
-      ${
-        station.aufgabentraegerShortName
-          ? `<p class="text-sm">Operator: ${station.aufgabentraegerShortName}</p>`
-          : ""
-      }
-      ${
-        isCollected
-          ? `<p class="text-sm text-green-600">In your collection</p>`
-          : `<p class="text-sm text-gray-500">Not collected yet</p>`
-      }
-    `;
-
-    container.innerHTML = html;
-
-    // Add collection button if not collected
-    if (!isCollected) {
-      const buttonContainer = document.createElement("div");
-      buttonContainer.className = "mt-2";
-
-      const button = document.createElement("button");
-      button.className =
-        "px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors";
-      button.textContent =
-        addingToCollection === station.id ? "Adding..." : "Add to Collection";
-      button.disabled = addingToCollection === station.id;
-
-      button.addEventListener("click", async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (addingToCollection) return;
-
-        try {
-          setAddingToCollection(station.id);
-          button.textContent = "Adding...";
-          button.disabled = true;
-
-          await addStationToCollection(station.id);
-
-          // Update button to show success
-          button.textContent = "Added!";
-          button.className =
-            "px-2 py-1 bg-green-500 text-white text-xs rounded";
-
-          // Close popup after a moment
-          setTimeout(() => {
-            if (map.current) {
-              // Use a more compatible way to close popups
-              const popups = document.querySelectorAll(".maplibregl-popup");
-              popups.forEach((popup) => popup.remove());
-
-              // Refresh markers to show updated collection status
-              if (map.current.fire) {
-                map.current.fire("moveend");
-              }
-            }
-          }, 1500);
-        } catch (error) {
-          console.error("Failed to add station to collection:", error);
-          button.textContent = "Failed - Try Again";
-          button.className =
-            "px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors";
-          button.disabled = false;
-        } finally {
-          setAddingToCollection(null);
+        // 3. Notify parent to refresh the main collection data (`entries` prop)
+        // This is the primary mechanism for updating the UI to "collected"
+        if (onCollectionUpdated) {
+          onCollectionUpdated();
         }
-      });
 
-      buttonContainer.appendChild(button);
-      container.appendChild(buttonContainer);
+        // 4. (Optional) Notify the server (fire-and-forget)
+        fetch("/api/collection/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ stationId: stationToCollect.id }),
+        })
+          .then(async (apiResponse) => {
+            if (!apiResponse.ok) {
+              const errorData = await apiResponse.json();
+              console.warn(
+                "API call to acknowledge station addition failed:",
+                errorData.error || apiResponse.statusText
+              );
+            } else {
+              console.log(
+                "API call to acknowledge station addition successful."
+              );
+            }
+          })
+          .catch((apiError) => {
+            console.warn(
+              "API call to acknowledge station addition failed:",
+              apiError
+            );
+          });
+
+        return true;
+      } else {
+        console.log("Station already in client DB or failed to add.");
+        // If addStationToClientDb returns false (e.g. already exists),
+        // onCollectionUpdated() might not have been called or won't change entries.
+        // The UI should already reflect it as collected if it was already in DB.
+        return false;
+      }
+    } catch (error) {
+      console.error("Error adding station to client collection:", error);
+      return false;
+    } finally {
+      // 5. Clear loading state for this specific station
+      setAddingToCollection(null);
     }
-
-    return container;
   };
 
-  // Load all stations from database
+  const fetchLocationDetails = async (lat: number, lon: number) => {
+    try {
+      setLocationLoading(true);
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&addressdetails=1`,
+        {
+          headers: {
+            "User-Agent": "Bahnhofjaeger/1.0 (luis.w.kisters@gmail.com)",
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch location details");
+      const data: NominatimResponse = await response.json();
+      setLocationDetails(data);
+    } catch (error) {
+      console.error("Error fetching location details:", error);
+      setLocationDetails(null);
+    } finally {
+      setLocationLoading(false);
+    }
+  };
+
+  const openStationDetails = (station: Station) => {
+    setSelectedStation(station);
+    setBottomSheetOpen(true);
+    setLocationDetails(null);
+    if (station.latitude && station.longitude) {
+      fetchLocationDetails(station.latitude, station.longitude);
+    }
+  };
+
   useEffect(() => {
-    async function loadAllStations() {
+    async function loadStationsForMap() {
       try {
         setLoading(true);
         const stations = await getAllStations();
         const validStations = stations.filter(
           (station) => station.latitude && station.longitude
         );
-        console.log(
-          `Loaded ${validStations.length} valid stations with coordinates`
-        );
-        setAllStations(validStations);
-        setLoading(false);
+        setAllStationsData(validStations);
       } catch (error) {
-        console.error("Error loading stations:", error);
+        console.error("Error loading stations for map:", error);
+        setLoadError("Fehler beim Laden der Stationsdaten");
+      } finally {
         setLoading(false);
       }
     }
-
-    loadAllStations();
+    loadStationsForMap();
   }, []);
 
-  // Initialize map once container is ready and stations are loaded
   useEffect(() => {
-    // Ensure the map is initialized only once
-    if (mapInitialized) return;
+    if (mapInitialized || !isOnline) return;
 
-    // Wait for the mapContainer to be available in the DOM
     const initializeMap = () => {
-      if (!mapContainer.current) {
-        console.log("Map container not ready yet, retrying soon...");
-        return false;
-      }
-
+      if (!mapContainer.current) return false;
       try {
-        console.log("Initializing MapTiler map...");
-
-        // Initialize map
         map.current = new maptilersdk.Map({
           container: mapContainer.current,
-          style: maptilersdk.MapStyle.STREETS.DARK,
+          style: maptilersdk.MapStyle.BASIC.DARK,
           center: defaultCenter,
           zoom: 5,
           maxZoom: 18,
@@ -290,296 +308,186 @@ export default function StationMap({
           navigationControl: false,
           geolocateControl: false,
         });
-
-        // // Add navigation and attribution controls
-        // map.current.addControl(new maptilersdk.NavigationControl());
-        // map.current.addControl(
-        //   new maptilersdk.AttributionControl({
-        //     compact: true,
-        //   })
-        // );
-
-        map.current.on("load", () => {
-          console.log("Map loaded successfully");
-          setMapLoaded(true);
-        });
-
+        map.current.on("load", () => setMapLoaded(true));
         map.current.on("error", (e) => {
           console.error("Map error:", e);
+          setLoadError("Fehler beim Laden der Karte");
         });
-
         setMapInitialized(true);
         return true;
       } catch (error) {
         console.error("Error initializing map:", error);
+        setLoadError("Fehler beim Initialisieren der Karte");
         return false;
       }
     };
-
-    // Try to initialize the map immediately
     if (!initializeMap()) {
-      // If it fails, retry after a short delay to ensure DOM is ready
       const timeoutId = setTimeout(() => {
-        if (!mapInitialized && mapContainer.current) {
-          console.log("Retrying map initialization...");
-          initializeMap();
-        }
+        if (!mapInitialized && mapContainer.current) initializeMap();
       }, 500);
-
       return () => clearTimeout(timeoutId);
     }
-
-    // Cleanup on unmount
     return () => {
       if (map.current) {
-        console.log("Removing map instance");
         map.current.remove();
         map.current = null;
       }
     };
-  }, [mapInitialized]);
+  }, [mapInitialized, isOnline]);
 
-  // Clean up any previous markers
   const cleanupMarkers = () => {
     if (markersRef.current.length > 0) {
-      console.log(`Removing ${markersRef.current.length} previous markers`);
       markersRef.current.forEach((marker) => marker.remove());
       markersRef.current = [];
     }
   };
 
-  // Add markers after map is loaded and stations data is available
   useEffect(() => {
-    if (!map.current || !mapLoaded || loading || allStations.length === 0) {
-      console.log("Skipping marker creation:", {
-        mapExists: !!map.current,
-        mapLoaded,
-        loading,
-        stationCount: allStations.length,
-      });
+    if (!map.current || !mapLoaded || loading || allStationsData.length === 0) {
       return;
     }
-
-    console.log("Adding markers to map");
     const mapInstance = map.current;
-    const maxMarkers = 400; // Limit maximum number of markers for performance
-
-    // Clean up any previous markers first
+    const maxMarkers = 400;
     cleanupMarkers();
 
-    // Add markers for each station - limit to visible area to improve performance
     const bounds = mapInstance.getBounds();
-    const visibleStations = allStations.filter((station) => {
+    const visibleStations = allStationsData.filter((station) => {
       if (!station.latitude || !station.longitude) return false;
-
-      // Check if station is within current map bounds
       return bounds.contains([
         station.longitude as number,
         station.latitude as number,
       ]);
     });
 
-    // Filter out uncollected stations if toggle is off
     let filteredStations = visibleStations;
     if (!showUncollected) {
       filteredStations = visibleStations.filter((station) =>
-        collectedStationIdsRef.current.has(station.id)
+        collectedStationIds.has(station.id)
       );
     }
 
-    // If too many stations are visible, only show some based on price class
-    // to avoid overloading the map with markers
     let stationsToShow = filteredStations;
-
     if (filteredStations.length > maxMarkers) {
-      console.log(
-        `Too many stations (${filteredStations.length}), filtering to important ones`
+      const collectedInView = filteredStations.filter((s) =>
+        collectedStationIds.has(s.id)
       );
-
-      // Always show collected stations
-      const collectedStations = filteredStations.filter((station) =>
-        collectedStationIdsRef.current.has(station.id)
-      );
-
-      // Then add higher price classes until we reach the limit
-      const uncollectedStations = filteredStations
-        .filter((station) => !collectedStationIdsRef.current.has(station.id))
-        .sort((a, b) => a.priceClass - b.priceClass); // Sort by price class (ascending)
-
-      // Calculate how many uncollected stations we can show
-      const remainingSlots = Math.max(0, maxMarkers - collectedStations.length);
-      const uncollectedToShow = uncollectedStations.slice(0, remainingSlots);
-
-      stationsToShow = [...collectedStations, ...uncollectedToShow];
+      const uncollectedInView = filteredStations
+        .filter((s) => !collectedStationIds.has(s.id))
+        .sort((a, b) => a.priceClass - b.priceClass);
+      const remainingSlots = Math.max(0, maxMarkers - collectedInView.length);
+      stationsToShow = [
+        ...collectedInView,
+        ...uncollectedInView.slice(0, remainingSlots),
+      ];
     }
 
-    // Sort stations so that collected ones are added last (will be on top)
     stationsToShow.sort((a, b) => {
-      const aCollected = collectedStationIdsRef.current.has(a.id);
-      const bCollected = collectedStationIdsRef.current.has(b.id);
-
-      if (aCollected === bCollected) {
-        // If both are collected or both are uncollected, sort by price class
-        return a.priceClass - b.priceClass; // Lower price class (higher value stations) on top
-      }
-
-      // Put uncollected first, so collected ones are added last (will be on top)
+      const aCollected = collectedStationIds.has(a.id);
+      const bCollected = collectedStationIds.has(b.id);
+      if (aCollected === bCollected) return a.priceClass - b.priceClass;
       return aCollected ? 1 : -1;
     });
 
-    // Create and add markers
     stationsToShow.forEach((station) => {
-      // These should be defined at this point due to our filtering above
       const longitude = station.longitude as number;
       const latitude = station.latitude as number;
-
-      // Check if station is in collection
-      const isCollected = collectedStationIdsRef.current.has(station.id);
-
-      // Create custom marker element
-      const markerElement = createCustomMarker(station, isCollected);
-
-      // Create popup
-      const popup = new maptilersdk.Popup({
-        closeButton: true,
-        closeOnClick: true,
-        offset: 12, // Slightly larger offset to position above markers
-        className: "station-popup",
-        maxWidth: "300px",
-      }).setDOMContent(createPopupContent(station, isCollected));
-
-      // Create marker with popup
-      const marker = new maptilersdk.Marker({
-        element: markerElement,
-      })
+      const isCollected = collectedStationIds.has(station.id);
+      const markerElement = createCustomMarker(station, isCollected, false);
+      const marker = new maptilersdk.Marker({ element: markerElement })
         .setLngLat([longitude, latitude])
-        .setPopup(popup)
         .addTo(mapInstance);
-
+      marker
+        .getElement()
+        .addEventListener("click", () => openStationDetails(station));
       markersRef.current.push(marker);
     });
 
-    console.log(`Added ${markersRef.current.length} markers to the map`);
-
-    // Update markers when map is moved
-    const updateMarkers = () => {
-      if (!map.current || !mapLoaded) return;
-      cleanupMarkers();
-
-      const newBounds = map.current.getBounds();
-      const newVisibleStations = allStations.filter((station) => {
-        if (!station.latitude || !station.longitude) return false;
-        return newBounds.contains([
-          station.longitude as number,
-          station.latitude as number,
-        ]);
-      });
-
-      // Filter out uncollected stations if toggle is off
-      let filteredVisibleStations = newVisibleStations;
-      if (!showUncollected) {
-        filteredVisibleStations = newVisibleStations.filter((station) =>
-          collectedStationIdsRef.current.has(station.id)
-        );
-      }
-
-      // Sort stations (collected ones last to be on top)
-      const sortedStations = [...filteredVisibleStations].sort((a, b) => {
-        const aCollected = collectedStationIdsRef.current.has(a.id);
-        const bCollected = collectedStationIdsRef.current.has(b.id);
-
-        if (aCollected === bCollected) {
-          return a.priceClass - b.priceClass; // Lower price class on top
-        }
-
-        return aCollected ? 1 : -1;
-      });
-
-      // Apply the same filtering logic as above
-      let newStationsToShow = sortedStations;
-      if (sortedStations.length > maxMarkers) {
-        const collectedStations = sortedStations.filter((station) =>
-          collectedStationIdsRef.current.has(station.id)
-        );
-
-        const uncollectedStations = sortedStations
-          .filter((station) => !collectedStationIdsRef.current.has(station.id))
-          .sort((a, b) => a.priceClass - b.priceClass);
-
-        const remainingSlots = Math.max(
-          0,
-          maxMarkers - collectedStations.length
-        );
-        const uncollectedToShow = uncollectedStations.slice(0, remainingSlots);
-
-        newStationsToShow = [...uncollectedToShow, ...collectedStations];
-      }
-
-      newStationsToShow.forEach((station) => {
-        const longitude = station.longitude as number;
-        const latitude = station.latitude as number;
-        const isCollected = collectedStationIdsRef.current.has(station.id);
-        const markerElement = createCustomMarker(station, isCollected);
-
-        // Create popup with collection functionality
-        const popup = new maptilersdk.Popup({
-          closeButton: true,
-          closeOnClick: true,
-          offset: 12, // Slightly larger offset
-          className: "station-popup",
-          maxWidth: "300px",
-        }).setDOMContent(createPopupContent(station, isCollected));
-
-        const marker = new maptilersdk.Marker({
-          element: markerElement,
-        })
-          .setLngLat([longitude, latitude])
-          .setPopup(popup)
-          .addTo(map.current!);
-
-        markersRef.current.push(marker);
-      });
+    const handleMoveEnd = () => {
+      console.log(
+        "Map move end, markers might re-evaluate based on visibility logic."
+      );
     };
 
-    // Add event listeners for map movement
-    mapInstance.on("moveend", updateMarkers);
-
-    // Cleanup markers on component update
+    mapInstance.on("moveend", handleMoveEnd);
     return () => {
-      mapInstance.off("moveend", updateMarkers);
+      mapInstance.off("moveend", handleMoveEnd);
       cleanupMarkers();
     };
   }, [
-    allStations,
+    allStationsData,
     mapLoaded,
     loading,
-    collectedStationIdsRef,
+    collectedStationIds,
     showUncollected,
-    onCollectionUpdated,
-    addingToCollection,
+    createCustomMarker,
+    openStationDetails,
   ]);
 
-  if (loading) {
+  // Render loading state
+  if (!isOnline) {
     return (
-      <div className="bg-white text-center">
-        <p className="text-gray-600">Loading stations map...</p>
+      <div className="bg-background-secondary text-white flex flex-col items-center justify-center h-full p-6">
+        <WifiOff className="h-16 w-16 text-muted-foreground mb-4" />
+        <h2 className="text-xl font-semibold mb-2">Keine Internetverbindung</h2>
+        <p className="text-center text-muted-foreground max-w-xs">
+          Die Karte benötigt eine aktive Internetverbindung. Bitte überprüfe
+          deine Verbindung und versuche es erneut.
+        </p>
       </div>
     );
   }
 
-  if (allStations.length === 0) {
+  if (loadError) {
     return (
-      <div className="bg-white text-center">
-        <p className="text-gray-600">
-          No stations with map coordinates available
+      <div className="bg-background-secondary text-white flex flex-col items-center justify-center h-full p-6">
+        <div className="rounded-full bg-red-900/20 p-4 mb-4">
+          <WifiOff className="h-8 w-8 text-red-500" />
+        </div>
+        <h2 className="text-xl font-semibold mb-2">Fehler beim Laden</h2>
+        <p className="text-center text-muted-foreground max-w-xs mb-4">
+          {loadError}. Bitte versuche es später erneut.
+        </p>
+        <Button
+          variant="outline"
+          onClick={() => window.location.reload()}
+          className="border-white/30 hover:bg-white/10 text-white"
+        >
+          Erneut versuchen
+        </Button>
+      </div>
+    );
+  }
+
+  if (loading && allStationsData.length === 0) {
+    return (
+      <div className="bg-background text-white flex flex-col items-center justify-center h-full">
+        <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
+        <p className="text-lg font-medium">Karte wird geladen...</p>
+        <p className="text-sm text-muted-foreground mt-2">
+          Stationsdaten werden vorbereitet
+        </p>
+      </div>
+    );
+  }
+
+  if (allStationsData.length === 0 && !loading) {
+    return (
+      <div className="bg-background-secondary text-white text-center p-6">
+        <div className="rounded-full bg-yellow-900/20 p-4 mx-auto mb-4 inline-block">
+          <WifiOff className="h-8 w-8 text-yellow-500" />
+        </div>
+        <p className="text-lg font-medium mb-2">
+          Keine Stationsdaten verfügbar
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Es sind keine Stationen mit Koordinaten verfügbar
         </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white w-full h-full flex flex-col">
-      {/* Map container - subtract height of controls */}
+    <div className="bg-background w-full h-full flex flex-col">
       <div className="flex-1 relative min-h-0">
         <div
           ref={mapContainer}
@@ -592,38 +500,72 @@ export default function StationMap({
             overflow: "hidden",
           }}
         />
+        <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="secondary"
+              className="absolute top-4 right-4 z-10 shadow-lg rounded-lg mt-[60px] bg-background-secondary w-14 h-14 p-1 flex items-center justify-center"
+              aria-label="Map Settings"
+            >
+              <Settings
+                strokeWidth={2.5}
+                style={{ width: "1rem", height: "1rem" }}
+                className="text-white"
+              />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Karten Einstellungen</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="show-uncollected"
+                  className="text-sm font-medium"
+                >
+                  Unbesuchte Bahnhöfe anzeigen
+                </label>
+                <Switch
+                  id="show-uncollected"
+                  checked={showUncollected}
+                  onCheckedChange={setShowUncollected}
+                />
+              </div>
+              <div className="mt-4 pt-4 border-t">
+                <h3 className="text-sm font-medium mb-2">Legende</h3>
+                <div className="space-y-1 text-xs">
+                  <div className="flex items-center">
+                    <span className="inline-block w-3 h-3 rounded-full bg-[var(--color-action)] mr-2"></span>{" "}
+                    Collected Station (Red)
+                  </div>
+                  <div className="flex items-center">
+                    <span className="inline-block w-3 h-3 rounded-full bg-[var(--color-secondary-marker, #777777)] mr-2"></span>{" "}
+                    Not Collected Station (Gray)
+                  </div>
+                  <p className="text-gray-500 mt-1">
+                    Größere Marker = höhere Preisklasse (kleinere Zahl).
+                  </p>
+                  <p className="text-gray-500 mt-1">
+                    Weniger wichtige Bahnhöfe (höhere Preisklasse) werden bei
+                    niedrigerem Zoom ausgeblendet.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
-      {/* Controls container */}
-      <div className="flex-none">
-        <div className="p-2 border-t">
-          <span className="inline-block mr-4">
-            <span className="inline-block w-3 h-3 rounded-full bg-[#0066ff] mr-1"></span>{" "}
-            Collected
-          </span>
-          <span className="inline-block">
-            <span className="inline-block w-3 h-3 rounded-full bg-[#808080] mr-1"></span>{" "}
-            Not collected
-          </span>
-          <span className="ml-4 text-xs text-gray-500">
-            Larger markers = higher price class (lower number)
-          </span>
-        </div>
-        <div className="flex items-center p-2">
-          <input
-            type="checkbox"
-            id="show-uncollected"
-            checked={showUncollected}
-            onChange={(e) => setShowUncollected(e.target.checked)}
-            className="mr-2 h-4 w-4 text-blue-500"
-          />
-          <label
-            htmlFor="show-uncollected"
-            className="text-sm text-gray-700 cursor-pointer"
-          >
-            Show uncollected stations
-          </label>
-        </div>
-      </div>
+      <BottomSheet
+        station={selectedStation}
+        isOpen={bottomSheetOpen}
+        onClose={() => setBottomSheetOpen(false)}
+        onAddToClientCollection={handleAddToClientCollection}
+        isCollected={isStationCollected}
+        isAddingToCollection={addingToCollection}
+        locationDetails={locationDetails}
+        locationLoading={locationLoading}
+      />
     </div>
   );
 }
