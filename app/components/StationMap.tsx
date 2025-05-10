@@ -426,7 +426,7 @@ export default function StationMap({
   // Render loading state
   if (!isOnline) {
     return (
-      <div className="bg-background-secondary text-white flex flex-col items-center justify-center h-full p-6">
+      <div className="bg-background text-white flex flex-col items-center justify-center h-full p-6">
         <WifiOff className="h-16 w-16 text-muted-foreground mb-4" />
         <h2 className="text-xl font-semibold mb-2">Keine Internetverbindung</h2>
         <p className="text-center text-muted-foreground max-w-xs">

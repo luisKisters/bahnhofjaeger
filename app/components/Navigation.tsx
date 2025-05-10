@@ -38,12 +38,12 @@ export const Navigation = () => {
           <span>Home</span>
         </NavLink>
 
-        <NavLink href="/map" active={pathname === "/map"}>
+        <NavLink href="/karte" active={pathname === "/karte"}>
           <Map className="h-6 w-6" />
           <span>Karte</span>
         </NavLink>
 
-        <NavLink href="/collection" active={pathname === "/collection"}>
+        <NavLink href="/rangliste" active={pathname === "/rangliste"}>
           <Trophy />
           <span>Rangliste</span>
         </NavLink>
