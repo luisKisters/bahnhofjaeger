@@ -16,8 +16,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Bahnhofjaeger",
-  description: "Collect train stations and earn points",
+  title: "Bahnjofjäger",
+  description: "Sammle Bahnhöfe und erhalte Punkte!",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
