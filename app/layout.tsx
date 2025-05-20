@@ -37,6 +37,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+        />
         <meta name="application-name" content="Bahnhofjaeger" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -81,7 +85,10 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ServiceWorkerRegistration />
-        <div className="flex flex-col min-h-screen bg-background">
+        <div
+          className="flex flex-col min-h-screen bg-background"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        >
           <SearchInput search={true} />
           <main className="flex-1 w-full h-full relative">{children}</main>
           <Navigation />
