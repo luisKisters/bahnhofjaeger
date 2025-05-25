@@ -9,7 +9,7 @@ if (!fs.existsSync(iconsDir)) {
 }
 
 // Get the SVG file
-const svgPath = path.join(iconsDir, "train-icon.svg");
+const svgPath = path.join(iconsDir, "icon.svg");
 const svgBuffer = fs.readFileSync(svgPath);
 
 // Generate the 192x192 icon
