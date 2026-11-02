@@ -1,16 +1,34 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import SearchInput from "@/app/components/SearchInput";
 import { Navigation } from "@/app/components/Navigation";
+import { readOnboarded } from "@/app/lib/onboarding";
 
 // Pages that render without the app chrome (search bar, bottom nav).
 const BARE_ROUTES = ["/start"];
+// Pages reachable before the user has seen the landing page.
+const PUBLIC_ROUTES = ["/start", "/privacy"];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const isPublic = PUBLIC_ROUTES.includes(pathname);
+  // null = not yet known (avoids flashing the app before redirecting)
+  const [onboarded, setOnboarded] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const done = readOnboarded();
+    setOnboarded(done);
+    if (!done && !isPublic) router.replace("/start");
+  }, [pathname, isPublic, router]);
+
   if (BARE_ROUTES.includes(pathname)) return <>{children}</>;
+  if (!isPublic && !onboarded) {
+    return <div className="min-h-screen bg-background" />;
+  }
 
   return (
     <div className="md:flex md:h-screen md:items-center md:justify-center md:gap-16 bg-background">
