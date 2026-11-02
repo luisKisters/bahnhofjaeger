@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build && cp -r .next release/",
+    "build": "next build --webpack && cp -r .next release/",
     "start": "next start",
     "lint": "next lint",
     "build-twa": "bubblewrap build && mv app-release-bundle.aab release/ && mv app-release-signed.apk release/ && mv app-release-signed.apk.idsig release/ && mv app-release-unsigned-aligned.apk release/",
