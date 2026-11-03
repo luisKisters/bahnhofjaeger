@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build && cp -r .next release/",
+    "build": "next build --webpack && cp -r .next release/",
     "start": "next start",
     "lint": "next lint",
     "build-twa": "bubblewrap build && mv app-release-bundle.aab release/ && mv app-release-signed.apk release/ && mv app-release-signed.apk.idsig release/ && mv app-release-unsigned-aligned.apk release/",
@@ -28,7 +28,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.507.0",
     "mapbox-gl": "^3.11.0",
-    "next": "15.3.8",
+    "next": "16.0.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-leaflet": "^5.0.0",

@@ -2,8 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "./components/ServiceWorkerRegistration";
-import SearchInput from "@/app/components/SearchInput";
-import { Navigation } from "@/app/components/Navigation";
+import { AppShell } from "@/app/components/AppShell";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +15,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Bahnjofjäger",
+  title: "Bahnhofjäger",
   description: "Sammle Bahnhöfe und erhalte Punkte!",
   manifest: "/manifest.json",
   appleWebApp: {
@@ -37,6 +36,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+        />
         <meta name="application-name" content="Bahnhofjaeger" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -79,13 +82,9 @@ export default function RootLayout({
         <link rel="mask-icon" href="/icons/icon-512x512.png" color="#0052D4" />
         <link rel="shortcut icon" href="/favicon.ico" />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} bg-background`}>
         <ServiceWorkerRegistration />
-        <div className="flex flex-col min-h-screen bg-background">
-          <SearchInput search={true} />
-          <main className="flex-1 w-full h-full relative">{children}</main>
-          <Navigation />
-        </div>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

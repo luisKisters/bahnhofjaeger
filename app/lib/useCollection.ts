@@ -6,15 +6,26 @@ import {
   addStationToCollection,
   removeStationFromCollection,
 } from "./collection";
+import { useCollectionContext } from "./CollectionContext";
 
 interface CollectionState {
   isLoading: boolean;
   entries: CollectionEntry[];
   stats: CollectionStats;
   error: Error | null;
+  refreshCollection: () => Promise<void>;
+  addStation: (station: Station) => Promise<boolean>;
+  removeStation: (stationId: string) => Promise<boolean>;
 }
 
-export function useCollection() {
+export function useCollection(): CollectionState {
+  // Try to use context if available
+  try {
+    return useCollectionContext();
+  } catch {
+    // Not in provider, fallback to local state
+  }
+
   const [state, setState] = useState<CollectionState>({
     isLoading: true,
     entries: [],
@@ -31,6 +42,9 @@ export function useCollection() {
       monthStreak: 0,
     },
     error: null,
+    refreshCollection: async () => {},
+    addStation: async () => false,
+    removeStation: async () => false,
   });
 
   // Load collection data
@@ -44,12 +58,13 @@ export function useCollection() {
         getCollectionStats(),
       ]);
 
-      setState({
+      setState((prev) => ({
+        ...prev,
         isLoading: false,
         entries,
         stats,
         error: null,
-      });
+      }));
     } catch (error) {
       console.error("Error in useCollection:", error);
       setState((prev) => ({
