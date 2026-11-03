@@ -141,9 +141,10 @@ export function BottomSheet({
     sheetStyle.zIndex = 60;
     sheetStyle.transform = "translateY(0%)";
   } else {
-    sheetStyle.bottom = "0px";
+    // Sit above the 64px bottom nav instead of behind it.
+    sheetStyle.bottom = "calc(64px + env(safe-area-inset-bottom))";
     sheetStyle.top = "auto";
-    sheetStyle.maxHeight = "75vh";
+    sheetStyle.maxHeight = "calc(75vh - 64px)";
     sheetStyle.height = "auto";
     sheetStyle.borderRadius = "1rem 1rem 0 0";
     sheetStyle.zIndex = 35;
